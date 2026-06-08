@@ -10,11 +10,20 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const body = await req.json();
+  let body: Record<string, unknown>;
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+  }
   const { name, fromEmail, fromName, fromDomain, unosendApiKey,
           sendWindowStart = 19, sendWindowEnd = 23,
           sendWindowDays = 'Mon,Tue,Wed,Thu,Fri,Sat',
-          tz = 'Asia/Kolkata', dailyCap = 10 } = body;
+          tz = 'Asia/Kolkata', dailyCap = 10 } = body as {
+    name?: string; fromEmail?: string; fromName?: string; fromDomain?: string;
+    unosendApiKey?: string; sendWindowStart?: number; sendWindowEnd?: number;
+    sendWindowDays?: string; tz?: string; dailyCap?: number;
+  };
   if (!name || !fromEmail || !unosendApiKey) {
     return NextResponse.json({ error: 'name, fromEmail, unosendApiKey required' }, { status: 400 });
   }
