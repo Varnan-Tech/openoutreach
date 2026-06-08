@@ -19,10 +19,25 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   return NextResponse.json(step, { status: 201 });
 }
 
-export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  await params;
-  const body = await req.json();
-  const { id, ...updates } = body;
-  const step = await prisma.sequenceStep.update({ where: { id }, data: updates });
-  return NextResponse.json(step);
+export async function PUT(req: NextRequest, { params: _params }: { params: Promise<{ id: string }> }) {
+  let body: Record<string, unknown>;
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+  }
+  const { id, stepNumber, delayDaysFromPrevious, subjectTemplate, bodyHtmlTemplate, bodyTextTemplate } = body as {
+    id?: string; stepNumber?: number; delayDaysFromPrevious?: number;
+    subjectTemplate?: string; bodyHtmlTemplate?: string; bodyTextTemplate?: string;
+  };
+  if (!id) return NextResponse.json({ error: 'id required in body' }, { status: 400 });
+  try {
+    const step = await prisma.sequenceStep.update({
+      where: { id },
+      data: { stepNumber, delayDaysFromPrevious, subjectTemplate, bodyHtmlTemplate, bodyTextTemplate },
+    });
+    return NextResponse.json(step);
+  } catch {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  }
 }
