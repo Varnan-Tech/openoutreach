@@ -29,15 +29,17 @@ export async function POST(_: NextRequest, { params }: { params: Promise<{ id: s
 
   // schedule step 1 for all new recipients in two bulk writes (not N sequential writes)
   const now = new Date();
-  await prisma.scheduledSend.createMany({
-    data: newRecipients.map(r => ({
-      recipientId: r.id, stepId: step0.id, scheduledAt: now, status: 'pending',
-    })),
-  });
-  await prisma.recipient.updateMany({
-    where: { campaignId: id, stage: 'new' },
-    data: { stage: 'in_sequence', currentStep: step0.stepNumber },
-  });
-  await prisma.campaign.update({ where: { id }, data: { status: 'active' } });
+  await prisma.$transaction([
+    prisma.scheduledSend.createMany({
+      data: newRecipients.map(r => ({
+        recipientId: r.id, stepId: step0.id, scheduledAt: now, status: 'pending',
+      })),
+    }),
+    prisma.recipient.updateMany({
+      where: { campaignId: id, stage: 'new' },
+      data: { stage: 'in_sequence', currentStep: step0.stepNumber },
+    }),
+    prisma.campaign.update({ where: { id }, data: { status: 'active' } }),
+  ]);
   return NextResponse.json({ launched: newRecipients.length });
 }
