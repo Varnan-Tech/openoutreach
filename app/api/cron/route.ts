@@ -42,6 +42,15 @@ export async function GET() {
 
   if (!send) return NextResponse.json({ message: 'No eligible sends (paused / outside window / cap hit)' });
 
+  // Atomically claim the send — prevents double-fire from concurrent cron invocations
+  const claimed = await prisma.scheduledSend.updateMany({
+    where: { id: send.id, status: 'pending' },
+    data: { status: 'sending' },
+  });
+  if (claimed.count === 0) {
+    return NextResponse.json({ message: 'Send already claimed by another instance' });
+  }
+
   const { campaign } = send.recipient;
   const recipientData = send.recipient.data as Record<string, unknown>;
   const subject = renderTemplate(send.step.subjectTemplate, recipientData);
@@ -88,7 +97,7 @@ export async function GET() {
     });
     await prisma.recipient.update({
       where: { id: send.recipientId },
-      data: { currentStep: send.step.stepNumber + 1 },
+      data: { stage: 'in_sequence', currentStep: send.step.stepNumber + 1 },
     });
   } else {
     await prisma.recipient.update({
