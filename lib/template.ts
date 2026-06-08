@@ -10,6 +10,7 @@ export function lintTemplate(template: string, csvHeaders: string[]): string[] {
   let m: RegExpExecArray | null;
   while ((m = tokenRe.exec(template)) !== null) {
     const token = m[1].trim();
+    if (/^[#/^!>&{]/.test(token)) continue; // skip Mustache section/partial/comment tags
     if (!csvHeaders.includes(token)) errors.push(`Token {{${token}}} not found in CSV headers`);
   }
   const spamPhrases = ['limited time', 'click here', 'act now', 'guarantee', 'free money'];
