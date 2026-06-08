@@ -69,7 +69,7 @@ export default function Home() {
             >
               <div className="text-[#e8f5e8] text-sm font-bold group-hover:text-[#ffcc00] transition-colors truncate">{c.name}</div>
               <div className="text-[#6a8a6a] text-xs truncate">{c.fromEmail}</div>
-              <div className="text-[#c8e6c8] text-sm font-bold tabular-nums">{c._count.recipients}</div>
+              <div className="text-[#c8e6c8] text-sm font-bold tabular-nums">{c._count?.recipients ?? 0}</div>
               <div className="text-[#6a8a6a] text-xs tabular-nums">{c.dailyCap}</div>
               <div className="flex items-center gap-2">
                 <span style={{ color: STATUS_COLOR[c.status] ?? '#666' }}>{STATUS_SYMBOL[c.status] ?? '?'}</span>

@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 
 const STAGES = ['new', 'in_sequence', 'replied', 'bounced', 'completed'] as const;
@@ -29,12 +29,18 @@ export default function CampaignPage() {
   const [msgType, setMsgType] = useState<'ok' | 'error'>('ok');
   const [launching, setLaunching] = useState(false);
 
-  const reload = () => {
-    fetch(`/api/campaigns/${id}`).then(r => r.json()).then(setCampaign);
-    fetch(`/api/campaigns/${id}/recipients`).then(r => r.json()).then(setRecipients);
-  };
+  const reload = useCallback(() => {
+    fetch(`/api/campaigns/${id}`)
+      .then(r => r.ok ? r.json() : Promise.reject(r.status))
+      .then(setCampaign)
+      .catch(() => setCampaign(null));
+    fetch(`/api/campaigns/${id}/recipients`)
+      .then(r => r.ok ? r.json() : Promise.reject(r.status))
+      .then(setRecipients)
+      .catch(() => setRecipients([]));
+  }, [id]);
 
-  useEffect(() => { if (id) reload(); }, [id]);
+  useEffect(() => { if (id) reload(); }, [id, reload]);
 
   async function launch() {
     setLaunching(true);
