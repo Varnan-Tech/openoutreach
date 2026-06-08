@@ -1,0 +1,93 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Campaign {
+  id                    String   @id @default(cuid())
+  name                  String
+  status                String   @default("draft") // draft | active | paused | completed
+  fromEmail             String
+  fromName              String
+  fromDomain            String
+  unosendApiKey         String
+  sendWindowStart       Int      @default(19) // hour in tz
+  sendWindowEnd         Int      @default(23)
+  sendWindowDays        String   @default("Mon,Tue,Wed,Thu,Fri,Sat")
+  tz                    String   @default("Asia/Kolkata")
+  dailyCap              Int      @default(10)
+  delayBetweenSendsSec  Int      @default(120)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  recipients    Recipient[]
+  sequenceSteps SequenceStep[]
+}
+
+model Recipient {
+  id           String   @id @default(cuid())
+  campaignId   String
+  email        String
+  data         Json     // entire CSV row as JSONB
+  rank         Int      @default(0)
+  stage        String   @default("new") // new|queued|in_sequence|replied|bounced|unsubscribed|completed
+  currentStep  Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  campaign       Campaign       @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  scheduledSends ScheduledSend[]
+  replies        Reply[]
+
+  @@unique([campaignId, email])
+  @@index([campaignId, stage])
+}
+
+model SequenceStep {
+  id                    String   @id @default(cuid())
+  campaignId            String
+  stepNumber            Int
+  delayDaysFromPrevious Int      @default(0)
+  subjectTemplate       String
+  bodyHtmlTemplate      String   @db.Text
+  bodyTextTemplate      String   @db.Text
+  createdAt             DateTime @default(now())
+
+  campaign       Campaign       @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  scheduledSends ScheduledSend[]
+
+  @@unique([campaignId, stepNumber])
+}
+
+model ScheduledSend {
+  id              String    @id @default(cuid())
+  recipientId     String
+  stepId          String
+  scheduledAt     DateTime
+  status          String    @default("pending") // pending|sent|failed|cancelled
+  unosendMsgId    String?
+  opens           Int       @default(0)
+  lastOpenedAt    DateTime?
+  error           String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  recipient Recipient    @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+  step      SequenceStep @relation(fields: [stepId], references: [id], onDelete: Cascade)
+
+  @@index([status, scheduledAt])
+  @@index([recipientId])
+}
+
+model Reply {
+  id                  String   @id @default(cuid())
+  recipientId         String
+  messageIdReferenced String?
+  body                String?  @db.Text
+  receivedAt          DateTime @default(now())
+
+  recipient Recipient @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+}
