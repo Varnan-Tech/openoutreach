@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { sendUnosend } from '@/lib/unosend';
+import { sendAutosend } from '@/lib/autosend';
 import { renderTemplate } from '@/lib/template';
 import { isWithinWindow } from '@/lib/window';
 
@@ -63,10 +63,10 @@ export async function GET() {
 
   let result: { messageId: string | null; raw: unknown };
   try {
-    result = await sendUnosend({
+    result = await sendAutosend({
       to: send.recipient.email, from: campaign.fromEmail,
       fromName: campaign.fromName, subject, html: htmlWithPixel, text,
-      unosendApiKey: campaign.unosendApiKey,
+      apiKey: campaign.unosendApiKey || process.env.AUTOSEND_API_KEY || '',
     });
   } catch (e: unknown) {
     await prisma.scheduledSend.update({
