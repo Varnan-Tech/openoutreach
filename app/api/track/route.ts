@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
   if (send.sentAt && Date.now() - send.sentAt.getTime() < 10_000) return servePixel();
 
   // Real human open — increment and advance stage
-  const protectedStages = ['replied', 'bounced', 'completed'];
+  const protectedStages = ['replied', 'bounced', 'unsubscribed', 'completed'];
   const shouldAdvanceStage = !protectedStages.includes(send.recipient.stage);
 
   if (shouldAdvanceStage) {
