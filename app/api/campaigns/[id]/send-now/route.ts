@@ -22,21 +22,24 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   });
   if (!step) return NextResponse.json({ error: 'Campaign has no sequence steps' }, { status: 400 });
 
-  // Create a ScheduledSend due now; cron picks it up on the next tick
-  await prisma.$transaction([
-    prisma.scheduledSend.create({
-      data: {
-        recipientId,
-        stepId: step.id,
-        scheduledAt: new Date(),
-        status: 'pending',
-      },
-    }),
-    prisma.recipient.update({
-      where: { id: recipientId },
-      data: { stage: 'in_sequence', currentStep: step.stepNumber },
-    }),
-  ]);
+  // Atomic: stage guard + create — callback form auto-rolls back if race detected
+  try {
+    await prisma.$transaction(async (tx) => {
+      const updated = await tx.recipient.updateMany({
+        where: { id: recipientId, stage: 'new' },
+        data: { stage: 'in_sequence', currentStep: step.stepNumber },
+      });
+      if (updated.count === 0) throw new Error('RACE');
+      await tx.scheduledSend.create({
+        data: { recipientId, stepId: step.id, scheduledAt: new Date(), status: 'pending' },
+      });
+    });
+  } catch (e) {
+    if ((e as Error).message === 'RACE') {
+      return NextResponse.json({ error: 'Recipient already queued' }, { status: 409 });
+    }
+    throw e;
+  }
 
   return NextResponse.json({ queued: true, recipientId });
 }
