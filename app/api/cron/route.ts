@@ -57,16 +57,24 @@ export async function GET() {
   const html = renderTemplate(send.step.bodyHtmlTemplate, recipientData);
   const text = renderTemplate(send.step.bodyTextTemplate, recipientData);
 
-  // tracking pixel
   const publicUrl = process.env.PUBLIC_URL ?? 'http://localhost:3000';
   const htmlWithPixel = html + `<img src="${publicUrl}/api/track?id=${send.id}" width="1" height="1" style="display:block;width:1px;height:1px;border:0" />`;
+
+  // STAGING_EMAIL: redirect all sends to test address without changing DB
+  const toEmail = process.env.STAGING_EMAIL || send.recipient.email;
+
+  // Threading: all steps in a sequence share the same anchor thread-ID,
+  // so Gmail groups them as one conversation thread for the recipient.
+  const threadId = `<thread-${send.recipientId}@openoutreach>`;
 
   let result: { messageId: string | null; raw: unknown };
   try {
     result = await sendAutosend({
-      to: send.recipient.email, from: campaign.fromEmail,
+      to: toEmail, from: campaign.fromEmail,
       fromName: campaign.fromName, subject, html: htmlWithPixel, text,
       apiKey: campaign.unosendApiKey || process.env.AUTOSEND_API_KEY || '',
+      inReplyTo: threadId,
+      references: threadId,
     });
   } catch (e: unknown) {
     await prisma.scheduledSend.update({
