@@ -62,13 +62,21 @@ export async function POST(req: NextRequest) {
   }
 
   if (event.includes('open')) {
-    await prisma.scheduledSend.update({
-      where: { id: send.id },
-      data: { opens: { increment: 1 }, lastOpenedAt: new Date() },
-    });
     const protectedStages = ['replied', 'bounced', 'unsubscribed', 'completed'];
-    if (!protectedStages.includes(send.recipient.stage)) {
-      await prisma.recipient.update({ where: { id: send.recipient.id }, data: { stage: 'opened' } });
+    const shouldAdvanceStage = !protectedStages.includes(send.recipient.stage);
+    if (shouldAdvanceStage) {
+      await prisma.$transaction([
+        prisma.scheduledSend.update({
+          where: { id: send.id },
+          data: { opens: { increment: 1 }, lastOpenedAt: new Date() },
+        }),
+        prisma.recipient.update({ where: { id: send.recipient.id }, data: { stage: 'opened' } }),
+      ]);
+    } else {
+      await prisma.scheduledSend.update({
+        where: { id: send.id },
+        data: { opens: { increment: 1 }, lastOpenedAt: new Date() },
+      });
     }
   }
 
