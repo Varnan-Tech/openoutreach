@@ -65,7 +65,7 @@ export async function GET() {
 
   // Threading: all steps in a sequence share the same anchor thread-ID,
   // so Gmail groups them as one conversation thread for the recipient.
-  const threadId = `<thread-${send.recipientId}@openoutreach>`;
+  const threadId = `<thread-${send.recipientId}@openoutreach.local>`;
 
   let result: { messageId: string | null; raw: unknown };
   try {
