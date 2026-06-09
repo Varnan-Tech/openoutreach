@@ -1,172 +1,338 @@
 'use client';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams } from 'next/navigation';
 
+const STATUS_CFG: Record<string, { label: string; color: string; bg: string; border: string }> = {
+  draft:     { label: 'Draft',     color: '#475569', bg: '#F1F5F9', border: '#CBD5E1' },
+  active:    { label: 'Active',    color: '#1D4ED8', bg: '#EFF6FF', border: '#BFDBFE' },
+  paused:    { label: 'Paused',    color: '#B45309', bg: '#FFFBEB', border: '#FDE68A' },
+  completed: { label: 'Completed', color: '#047857', bg: '#ECFDF5', border: '#A7F3D0' },
+};
+
 const STAGES = ['new', 'in_sequence', 'replied', 'bounced', 'completed'] as const;
-type Stage = typeof STAGES[number];
-
-const STAGE_COLOR: Record<Stage, string> = {
-  new: '#4a6a4a',
-  in_sequence: '#ffcc00',
-  replied: '#4caf50',
-  bounced: '#ef5350',
-  completed: '#78909c',
+const STAGE_LABEL: Record<string, string> = {
+  new: 'New', in_sequence: 'In Seq', replied: 'Replied', bounced: 'Bounced', completed: 'Done',
+};
+const STAGE_COLOR: Record<string, string> = {
+  new: '#475569', in_sequence: '#1D4ED8', replied: '#047857', bounced: '#B91C1C', completed: '#6D28D9',
 };
 
-const STAGE_LABEL: Record<Stage, string> = {
-  new: 'NEW',
-  in_sequence: 'IN SEQ',
-  replied: 'REPLIED',
-  bounced: 'BOUNCED',
-  completed: 'DONE',
-};
+type StepDraft = { subject: string; bodyText: string; delayDays: number };
+
+const inputCls = "w-full bg-white border border-slate-300 text-slate-900 px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent placeholder:text-slate-400 transition";
 
 export default function CampaignPage() {
   const { id } = useParams<{ id: string }>();
   const [campaign, setCampaign] = useState<any>(null);
   const [recipients, setRecipients] = useState<any[]>([]);
+  const [steps, setSteps] = useState<any[]>([]);
   const [msg, setMsg] = useState('');
   const [msgType, setMsgType] = useState<'ok' | 'error'>('ok');
   const [launching, setLaunching] = useState(false);
+  const [showAddStep, setShowAddStep] = useState(false);
+  const [draft, setDraft] = useState<StepDraft>({ subject: '', bodyText: '', delayDays: 0 });
+  const [addingStep, setAddingStep] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
 
   const reload = useCallback(() => {
-    fetch(`/api/campaigns/${id}`)
-      .then(r => r.ok ? r.json() : Promise.reject(r.status))
-      .then(setCampaign)
-      .catch(() => setCampaign(null));
-    fetch(`/api/campaigns/${id}/recipients`)
-      .then(r => r.ok ? r.json() : Promise.reject(r.status))
-      .then(setRecipients)
-      .catch(() => setRecipients([]));
+    fetch(`/api/campaigns/${id}`).then(r => r.ok ? r.json() : null).then(d => { if (d) setCampaign(d); });
+    fetch(`/api/campaigns/${id}/recipients`).then(r => r.ok ? r.json() : []).then(setRecipients);
+    fetch(`/api/campaigns/${id}/steps`).then(r => r.ok ? r.json() : []).then(setSteps);
   }, [id]);
 
   useEffect(() => { if (id) reload(); }, [id, reload]);
+
+  function flash(text: string, type: 'ok' | 'error') {
+    setMsg(text); setMsgType(type);
+    setTimeout(() => setMsg(''), 4000);
+  }
 
   async function launch() {
     setLaunching(true);
     const res = await fetch(`/api/campaigns/${id}/launch`, { method: 'POST' });
     const data = await res.json();
-    if (res.ok) {
-      setMsg(`LAUNCHED — ${data.launched} RECIPIENTS QUEUED`);
-      setMsgType('ok');
-      reload();
-    } else {
-      setMsg(data.error ?? data.lintErrors?.join(' · ') ?? 'LAUNCH FAILED');
-      setMsgType('error');
-    }
+    if (res.ok) { flash(`Launched — ${data.launched} recipients queued`, 'ok'); reload(); }
+    else { flash(data.error ?? data.lintErrors?.join(' · ') ?? 'Launch failed', 'error'); }
     setLaunching(false);
   }
 
+  async function addStep(e: React.FormEvent) {
+    e.preventDefault();
+    setAddingStep(true);
+    const stepNumber = (steps[steps.length - 1]?.stepNumber ?? 0) + 1;
+    const html = draft.bodyText.split('\n\n').map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
+    const res = await fetch(`/api/campaigns/${id}/steps`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        stepNumber,
+        delayDaysFromPrevious: draft.delayDays,
+        subjectTemplate: draft.subject,
+        bodyHtmlTemplate: html,
+        bodyTextTemplate: draft.bodyText,
+      }),
+    });
+    if (res.ok) {
+      setDraft({ subject: '', bodyText: '', delayDays: 0 });
+      setShowAddStep(false);
+      reload();
+    } else {
+      flash('Failed to add step', 'error');
+    }
+    setAddingStep(false);
+  }
+
+  async function deleteStep(stepId: string) {
+    if (!confirm('Delete this step? This cannot be undone.')) return;
+    const res = await fetch(`/api/campaigns/${id}/steps?stepId=${stepId}`, { method: 'DELETE' });
+    if (res.ok) reload();
+    else flash('Failed to delete step', 'error');
+  }
+
+  async function uploadCSV(file: File) {
+    setUploading(true);
+    const text = await file.text();
+    const res = await fetch(`/api/campaigns/${id}/recipients`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ csv: text }),
+    });
+    const data = await res.json();
+    if (res.ok) { flash(`Uploaded — ${data.inserted} recipients added, ${data.skipped} skipped`, 'ok'); reload(); }
+    else { flash(data.error ?? 'Upload failed', 'error'); }
+    setUploading(false);
+  }
+
   if (!campaign) return (
-    <main style={{ fontFamily: "'JetBrains Mono', monospace" }} className="min-h-screen bg-[#0a0f0a] text-[#4a6a4a] flex items-center justify-center">
-      <div className="text-sm tracking-[0.3em] uppercase">LOADING...</div>
+    <main className="min-h-screen flex items-center justify-center">
+      <p className="text-slate-400">Loading…</p>
     </main>
   );
 
   const counts: Record<string, number> = {};
   STAGES.forEach(s => { counts[s] = recipients.filter(r => r.stage === s).length; });
+  const sc = STATUS_CFG[campaign.status] ?? STATUS_CFG.draft;
 
   return (
-    <main style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }} className="min-h-screen bg-[#0a0f0a] text-[#c8e6c8] p-8">
-      <div className="border-b border-[#2a3a2a] pb-6 mb-8">
-        <a href="/" className="text-[#4a6a4a] text-xs tracking-[0.2em] uppercase hover:text-[#ffcc00] transition-colors">← DISPATCH BOARD</a>
-        <div className="flex items-end justify-between mt-4">
-          <div>
-            <div className="text-[10px] text-[#4a6a4a] tracking-[0.3em] uppercase mb-1">{campaign.fromEmail}</div>
-            <h1 className="text-2xl font-bold text-[#e8f5e8]">{campaign.name}</h1>
-          </div>
-          <div className="flex items-center gap-3">
-            <span
-              className="text-xs tracking-[0.2em] uppercase px-3 py-1.5"
-              style={{
-                color: campaign.status === 'active' ? '#ffcc00' : '#4a6a4a',
-                border: `1px solid ${campaign.status === 'active' ? '#ffcc00' : '#2a3a2a'}`,
-              }}
-            >
-              {campaign.status}
-            </span>
-            {campaign.status === 'draft' && (
-              <button
-                onClick={launch}
-                disabled={launching}
-                className="border border-[#4caf50] text-[#4caf50] px-5 py-1.5 text-xs tracking-[0.2em] uppercase hover:bg-[#4caf50] hover:text-[#0a0f0a] transition-colors disabled:opacity-40"
+    <main className="min-h-screen p-8">
+      <div className="max-w-4xl mx-auto space-y-6">
+
+        {/* Header */}
+        <div>
+          <a href="/" className="text-sm text-slate-500 hover:text-slate-700 transition-colors">← Dashboard</a>
+          <div className="flex items-start justify-between mt-3">
+            <div>
+              <p className="text-xs text-slate-400 mb-1">{campaign.fromEmail}</p>
+              <h1 className="text-2xl font-bold text-slate-900">{campaign.name}</h1>
+            </div>
+            <div className="flex items-center gap-3">
+              <span
+                className="text-xs font-semibold px-3 py-1.5 rounded-full border"
+                style={{ color: sc.color, background: sc.bg, borderColor: sc.border }}
               >
-                {launching ? 'LAUNCHING...' : '▶ LAUNCH'}
+                {sc.label}
+              </span>
+              {campaign.status === 'draft' && (
+                <button
+                  onClick={launch}
+                  disabled={launching}
+                  className="bg-emerald-600 text-white px-5 py-2 rounded-lg text-sm font-semibold hover:bg-emerald-700 transition-colors disabled:opacity-50 shadow-sm"
+                >
+                  {launching ? 'Launching…' : '▶ Launch'}
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Flash message */}
+        {msg && (
+          <div
+            className="px-4 py-3 rounded-lg text-sm font-medium border"
+            style={{
+              color: msgType === 'ok' ? '#047857' : '#B91C1C',
+              background: msgType === 'ok' ? '#ECFDF5' : '#FEF2F2',
+              borderColor: msgType === 'ok' ? '#A7F3D0' : '#FECACA',
+            }}
+          >
+            {msg}
+          </div>
+        )}
+
+        {/* Stage counters */}
+        <div className="grid grid-cols-5 gap-3">
+          {STAGES.map(s => (
+            <div key={s} className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+              <div
+                className="text-3xl font-bold tabular-nums mb-1"
+                style={{ color: counts[s] > 0 ? STAGE_COLOR[s] : '#CBD5E1' }}
+              >
+                {counts[s] ?? 0}
+              </div>
+              <div className="text-xs text-slate-400 font-medium">{STAGE_LABEL[s]}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Campaign details */}
+        <div className="grid grid-cols-3 gap-4">
+          <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Send Window</p>
+            <p className="text-slate-800 font-semibold">{campaign.sendWindowStart}:00 – {campaign.sendWindowEnd}:00</p>
+            <p className="text-slate-400 text-sm mt-0.5">{campaign.sendWindowDays}</p>
+          </div>
+          <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Daily Cap</p>
+            <p className="text-slate-800 font-bold text-2xl tabular-nums">{campaign.dailyCap}</p>
+            <p className="text-slate-400 text-sm mt-0.5">emails / day</p>
+          </div>
+          <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Timezone</p>
+            <p className="text-slate-800 font-semibold">{campaign.tz}</p>
+            <p className="text-slate-400 text-sm mt-0.5">{steps.length} step{steps.length !== 1 ? 's' : ''}</p>
+          </div>
+        </div>
+
+        {/* Sequence Steps */}
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
+            <h2 className="font-semibold text-slate-800">Sequence Steps</h2>
+            {!showAddStep && (
+              <button
+                onClick={() => setShowAddStep(true)}
+                className="text-sm font-medium text-indigo-600 hover:text-indigo-700 transition-colors"
+              >
+                + Add Step
               </button>
             )}
           </div>
-        </div>
-      </div>
 
-      {msg && (
-        <div
-          className="mb-6 px-4 py-3 text-xs tracking-[0.1em] border"
-          style={{
-            borderColor: msgType === 'ok' ? '#2e7d32' : '#c62828',
-            color: msgType === 'ok' ? '#4caf50' : '#ef5350',
-            background: msgType === 'ok' ? 'rgba(46,125,50,0.1)' : 'rgba(198,40,40,0.1)',
-          }}
-        >
-          {msg}
-        </div>
-      )}
-
-      <div className="grid grid-cols-5 gap-3 mb-8">
-        {STAGES.map(s => (
-          <div key={s} className="border border-[#1a2a1a] p-4">
-            <div
-              className="text-3xl font-bold tabular-nums mb-1"
-              style={{ color: counts[s] > 0 ? STAGE_COLOR[s] : '#2a3a2a' }}
-            >
-              {counts[s] ?? 0}
+          {steps.length === 0 && !showAddStep && (
+            <div className="px-5 py-8 text-center text-slate-400 text-sm">
+              No steps yet — add your first email step above
             </div>
-            <div className="text-[10px] text-[#4a6a4a] tracking-[0.2em]">{STAGE_LABEL[s]}</div>
+          )}
+
+          {steps.map(step => (
+            <div key={step.id} className="px-5 py-4 border-b border-slate-100 last:border-0 flex items-start justify-between gap-4">
+              <div className="flex items-start gap-4 min-w-0">
+                <div className="w-8 h-8 rounded-full bg-indigo-50 border border-indigo-200 flex items-center justify-center text-sm font-bold text-indigo-600 shrink-0">
+                  {step.stepNumber}
+                </div>
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-slate-800 truncate">{step.subjectTemplate}</p>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    {step.delayDaysFromPrevious === 0 ? 'Send immediately' : `Wait ${step.delayDaysFromPrevious} day${step.delayDaysFromPrevious !== 1 ? 's' : ''}`}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => deleteStep(step.id)}
+                className="text-slate-300 hover:text-red-500 transition-colors text-sm shrink-0"
+                title="Delete step"
+              >
+                ✕
+              </button>
+            </div>
+          ))}
+
+          {showAddStep && (
+            <form onSubmit={addStep} className="px-5 py-5 bg-slate-50 border-t border-slate-100 space-y-4">
+              <p className="text-sm font-semibold text-slate-700">
+                Step {(steps[steps.length - 1]?.stepNumber ?? 0) + 1}
+              </p>
+              <div className="grid grid-cols-3 gap-4">
+                <div className="col-span-2">
+                  <label className="block text-xs font-medium text-slate-600 mb-1">Subject template</label>
+                  <input
+                    type="text" required className={inputCls} placeholder="Hey {{first_name}}!"
+                    value={draft.subject} onChange={e => setDraft(d => ({ ...d, subject: e.target.value }))}
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-slate-600 mb-1">Delay (days)</label>
+                  <input
+                    type="number" min={0} className={inputCls}
+                    value={draft.delayDays} onChange={e => setDraft(d => ({ ...d, delayDays: Number(e.target.value) }))}
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-slate-600 mb-1">Email body (plain text — use {`{{first_name}}`} etc.)</label>
+                <textarea
+                  required rows={6} className={inputCls + ' resize-none'} placeholder={"Hi {{first_name}},\n\nYour message here...\n\nBest,\nYour name"}
+                  value={draft.bodyText} onChange={e => setDraft(d => ({ ...d, bodyText: e.target.value }))}
+                />
+              </div>
+              <div className="flex gap-3">
+                <button
+                  type="submit" disabled={addingStep}
+                  className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-indigo-700 transition-colors disabled:opacity-50"
+                >
+                  {addingStep ? 'Adding…' : 'Add Step'}
+                </button>
+                <button
+                  type="button" onClick={() => setShowAddStep(false)}
+                  className="px-4 py-2 rounded-lg text-sm font-medium text-slate-500 hover:text-slate-700 transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          )}
+        </div>
+
+        {/* CSV Upload */}
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+          <div className="px-5 py-4 border-b border-slate-100">
+            <h2 className="font-semibold text-slate-800">Upload Recipients</h2>
+            <p className="text-xs text-slate-400 mt-0.5">CSV must include an <code className="bg-slate-100 px-1 rounded">email</code> column. Extra columns become template variables.</p>
           </div>
-        ))}
-      </div>
+          <div className="px-5 py-5">
+            <input
+              ref={fileRef} type="file" accept=".csv" className="hidden"
+              onChange={e => { const f = e.target.files?.[0]; if (f) uploadCSV(f); e.target.value = ''; }}
+            />
+            <button
+              onClick={() => fileRef.current?.click()}
+              disabled={uploading}
+              className="flex items-center gap-2 border-2 border-dashed border-slate-300 hover:border-indigo-400 text-slate-500 hover:text-indigo-600 px-5 py-4 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 w-full justify-center"
+            >
+              {uploading ? 'Uploading…' : '↑ Click to upload CSV'}
+            </button>
+          </div>
+        </div>
 
-      <div className="grid grid-cols-3 gap-6 mb-8 text-sm">
-        <div className="border border-[#1a2a1a] p-4">
-          <div className="text-[10px] text-[#4a6a4a] tracking-[0.2em] uppercase mb-2">SEND WINDOW</div>
-          <div className="text-[#c8e6c8]">{campaign.sendWindowStart}:00 – {campaign.sendWindowEnd}:00</div>
-          <div className="text-[#6a8a6a] text-xs mt-1">{campaign.sendWindowDays}</div>
-        </div>
-        <div className="border border-[#1a2a1a] p-4">
-          <div className="text-[10px] text-[#4a6a4a] tracking-[0.2em] uppercase mb-2">DAILY CAP</div>
-          <div className="text-[#c8e6c8] text-2xl font-bold tabular-nums">{campaign.dailyCap}</div>
-          <div className="text-[#6a8a6a] text-xs mt-1">emails / day</div>
-        </div>
-        <div className="border border-[#1a2a1a] p-4">
-          <div className="text-[10px] text-[#4a6a4a] tracking-[0.2em] uppercase mb-2">TIMEZONE</div>
-          <div className="text-[#c8e6c8]">{campaign.tz}</div>
-          <div className="text-[#6a8a6a] text-xs mt-1">{campaign.sequenceSteps?.length ?? 0} sequence steps</div>
-        </div>
-      </div>
-
-      {recipients.length > 0 && (
-        <>
-          <div className="text-[10px] text-[#4a6a4a] tracking-[0.25em] uppercase mb-2">RECIPIENTS ({recipients.length})</div>
-          <div className="border border-[#1a2a1a]">
-            <div className="grid grid-cols-[1fr_100px_60px] text-[10px] text-[#4a6a4a] tracking-[0.2em] uppercase border-b border-[#1a2a1a] px-4 py-2">
-              <span>EMAIL</span>
-              <span>STAGE</span>
-              <span>STEP</span>
+        {/* Recipients table */}
+        {recipients.length > 0 && (
+          <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+            <div className="px-5 py-4 border-b border-slate-100">
+              <h2 className="font-semibold text-slate-800">Recipients ({recipients.length})</h2>
+            </div>
+            <div className="grid grid-cols-[1fr_100px_60px] text-xs font-semibold text-slate-400 uppercase tracking-wider px-5 py-2.5 bg-slate-50 border-b border-slate-100">
+              <span>Email</span>
+              <span>Stage</span>
+              <span>Step</span>
             </div>
             {recipients.slice(0, 100).map(r => (
-              <div key={r.id} className="grid grid-cols-[1fr_100px_60px] px-4 py-2 border-b border-[#0e140e] hover:bg-[#0e140e] text-sm transition-colors">
-                <span className="text-[#c8e6c8] truncate">{r.email}</span>
-                <span style={{ color: STAGE_COLOR[r.stage as Stage] ?? '#4a6a4a' }} className="text-xs uppercase tracking-wider">
-                  {STAGE_LABEL[r.stage as Stage] ?? r.stage}
+              <div key={r.id} className="grid grid-cols-[1fr_100px_60px] items-center px-5 py-3 border-b border-slate-100 last:border-0 hover:bg-slate-50 transition-colors">
+                <span className="text-sm text-slate-700 truncate">{r.email}</span>
+                <span
+                  className="text-xs font-semibold"
+                  style={{ color: STAGE_COLOR[r.stage] ?? '#94A3B8' }}
+                >
+                  {STAGE_LABEL[r.stage] ?? r.stage}
                 </span>
-                <span className="text-[#4a6a4a] tabular-nums">{r.currentStep ?? '—'}</span>
+                <span className="text-slate-400 tabular-nums text-sm">{r.currentStep || '—'}</span>
               </div>
             ))}
             {recipients.length > 100 && (
-              <div className="px-4 py-2 text-[#4a6a4a] text-xs">+ {recipients.length - 100} more</div>
+              <div className="px-5 py-3 text-slate-400 text-sm">+ {recipients.length - 100} more</div>
             )}
           </div>
-        </>
-      )}
+        )}
+      </div>
     </main>
   );
 }

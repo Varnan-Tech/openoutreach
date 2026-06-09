@@ -19,6 +19,18 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   return NextResponse.json(step, { status: 201 });
 }
 
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id: campaignId } = await params;
+  const stepId = req.nextUrl.searchParams.get('stepId');
+  if (!stepId) return NextResponse.json({ error: 'stepId required' }, { status: 400 });
+  try {
+    await prisma.sequenceStep.delete({ where: { id: stepId, campaignId } });
+    return NextResponse.json({ deleted: true });
+  } catch {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  }
+}
+
 export async function PUT(req: NextRequest, { params: _params }: { params: Promise<{ id: string }> }) {
   let body: Record<string, unknown>;
   try {
