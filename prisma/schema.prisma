@@ -33,7 +33,7 @@ model Recipient {
   email        String
   data         Json     // entire CSV row as JSONB
   rank         Int      @default(0)
-  stage        String   @default("new") // new|queued|in_sequence|replied|bounced|unsubscribed|completed
+  stage        String   @default("new") // new|queued|in_sequence|opened|replied|bounced|unsubscribed|completed
   currentStep  Int      @default(0)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
@@ -67,6 +67,7 @@ model ScheduledSend {
   recipientId     String
   stepId          String
   scheduledAt     DateTime
+  sentAt          DateTime? // actual send time — set by cron; used for bot-open timing filter
   status          String    @default("pending") // pending|sent|failed|cancelled
   unosendMsgId    String?
   opens           Int       @default(0)

@@ -78,7 +78,7 @@ export async function GET() {
 
   await prisma.scheduledSend.update({
     where: { id: send.id },
-    data: { status: 'sent', unosendMsgId: result.messageId },
+    data: { status: 'sent', unosendMsgId: result.messageId, sentAt: new Date() },
   });
 
   // queue next step if exists
