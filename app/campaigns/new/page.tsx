@@ -8,20 +8,42 @@ type FormState = {
   sendWindowDays: string; tz: string; dailyCap: number;
 };
 
-const inputCls = "w-full bg-white border border-slate-300 text-slate-900 px-3 py-2.5 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent placeholder:text-slate-400 transition";
-const labelCls = "block text-sm font-medium text-slate-700 mb-1.5";
+const iStyle: React.CSSProperties = {
+  width: '100%', boxSizing: 'border-box',
+  border: '1px solid var(--border-2)',
+  borderRadius: 8, padding: '9px 12px',
+  fontSize: 13, color: 'var(--text)',
+  background: 'var(--surface-2)', outline: 'none',
+  transition: 'border-color 0.15s, box-shadow 0.15s',
+  fontFamily: 'inherit',
+};
 
-// Defined OUTSIDE component — keeps component reference stable across renders
-// so React won't remount inputs on every keystroke.
+const lStyle: React.CSSProperties = {
+  fontSize: 11, fontWeight: 600, color: 'var(--dim)',
+  marginBottom: 6, display: 'block',
+  textTransform: 'uppercase', letterSpacing: '0.07em',
+};
+
 function TF({ label, value, onChange, placeholder, required }: {
   label: string; value: string; onChange: (v: string) => void;
   placeholder?: string; required?: boolean;
 }) {
   return (
     <div>
-      <label className={labelCls}>{label}</label>
-      <input type="text" value={value} onChange={e => onChange(e.target.value)}
-        placeholder={placeholder} required={required} className={inputCls} />
+      <label style={lStyle}>{label}</label>
+      <input
+        type="text" value={value} placeholder={placeholder} required={required}
+        onChange={e => onChange(e.target.value)}
+        style={iStyle}
+        onFocus={e => {
+          e.target.style.borderColor = 'rgba(99,102,241,0.5)';
+          e.target.style.boxShadow = '0 0 0 3px rgba(99,102,241,0.08)';
+        }}
+        onBlur={e => {
+          e.target.style.borderColor = 'var(--border-2)';
+          e.target.style.boxShadow = 'none';
+        }}
+      />
     </div>
   );
 }
@@ -31,9 +53,20 @@ function NF({ label, value, onChange, min, max }: {
 }) {
   return (
     <div>
-      <label className={labelCls}>{label}</label>
-      <input type="number" value={value} onChange={e => onChange(Number(e.target.value))}
-        min={min} max={max} required className={inputCls} />
+      <label style={lStyle}>{label}</label>
+      <input
+        type="number" value={value} min={min} max={max} required
+        onChange={e => onChange(Number(e.target.value))}
+        style={iStyle}
+        onFocus={e => {
+          e.target.style.borderColor = 'rgba(99,102,241,0.5)';
+          e.target.style.boxShadow = '0 0 0 3px rgba(99,102,241,0.08)';
+        }}
+        onBlur={e => {
+          e.target.style.borderColor = 'var(--border-2)';
+          e.target.style.boxShadow = 'none';
+        }}
+      />
     </div>
   );
 }
@@ -68,62 +101,89 @@ export default function NewCampaign() {
   }
 
   return (
-    <main className="min-h-screen p-8">
-      <div className="max-w-xl mx-auto">
-        <div className="mb-6">
-          <a href="/" className="text-sm text-slate-500 hover:text-slate-700 transition-colors">← Dashboard</a>
-          <h1 className="text-2xl font-bold text-slate-900 mt-3">New Campaign</h1>
-          <p className="text-slate-500 text-sm mt-1">Set up a new outreach sequence</p>
+    <div style={{ background: 'var(--bg)', minHeight: 'calc(100vh - 52px)', padding: '36px 32px', fontFamily: 'var(--font-ui)' }}>
+      <div style={{ maxWidth: 540, margin: '0 auto' }}>
+
+        <div style={{ marginBottom: 26 }}>
+          <a href="/" style={{ fontSize: 12, color: 'var(--indigo)', textDecoration: 'none', fontWeight: 500 }}>← Campaigns</a>
+          <h1 style={{
+            fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 400,
+            color: 'var(--text)', margin: '10px 0 4px', letterSpacing: '0.01em',
+          }}>
+            New Campaign
+          </h1>
+          <p style={{ color: 'var(--muted)', fontSize: 13, margin: 0 }}>Set up a new outreach sequence</p>
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm mb-5">
+          <div style={{
+            background: 'var(--coral-pale)', border: '1px solid rgba(251,113,133,0.2)',
+            color: 'var(--coral)', padding: '10px 14px', borderRadius: 8,
+            fontSize: 13, marginBottom: 18,
+          }}>
             {error}
           </div>
         )}
 
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
-          <form onSubmit={submit} className="space-y-5">
-            <TF label="Campaign name" value={form.name} onChange={v => set('name', v)}
-              placeholder="OpenDirectory cold outreach" required />
+        <div style={{
+          background: 'var(--surface)', borderRadius: 14,
+          border: '1px solid var(--border)', padding: '24px 26px',
+        }}>
+          <form onSubmit={submit}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
 
-            <div className="grid grid-cols-2 gap-4">
-              <TF label="From email" value={form.fromEmail} onChange={v => set('fromEmail', v)}
-                placeholder="paras@opendirectory.dev" required />
-              <TF label="From name" value={form.fromName} onChange={v => set('fromName', v)}
-                placeholder="Paras" required />
-            </div>
+              <TF label="Campaign name" value={form.name} onChange={v => set('name', v)}
+                placeholder="OpenDirectory cold outreach" required />
 
-            <TF label="Autosend API key" value={form.unosendApiKey} onChange={v => set('unosendApiKey', v)}
-              placeholder="AS_..." required />
-
-            <div className="border-t border-slate-100 pt-5">
-              <p className="text-sm font-semibold text-slate-700 mb-4">Send Window</p>
-              <div className="grid grid-cols-2 gap-4">
-                <NF label="Start hour (0–23)" value={form.sendWindowStart} onChange={v => set('sendWindowStart', v)} min={0} max={23} />
-                <NF label="End hour (0–23)" value={form.sendWindowEnd} onChange={v => set('sendWindowEnd', v)} min={0} max={23} />
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+                <TF label="From email" value={form.fromEmail} onChange={v => set('fromEmail', v)}
+                  placeholder="paras@domain.com" required />
+                <TF label="From name" value={form.fromName} onChange={v => set('fromName', v)}
+                  placeholder="Paras" required />
               </div>
-              <div className="mt-4">
-                <TF label="Active days (comma-separated)" value={form.sendWindowDays} onChange={v => set('sendWindowDays', v)}
-                  placeholder="Mon,Tue,Wed,Thu,Fri" />
+
+              <TF label="Autosend API key" value={form.unosendApiKey} onChange={v => set('unosendApiKey', v)}
+                placeholder="AS_..." required />
+
+              <div style={{ borderTop: '1px solid var(--border)', paddingTop: 18 }}>
+                <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--dim)', marginBottom: 14, textTransform: 'uppercase', letterSpacing: '0.09em', fontFamily: 'var(--font-mono)' }}>
+                  Send Window
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+                  <NF label="Start hour (0–23)" value={form.sendWindowStart} onChange={v => set('sendWindowStart', v)} min={0} max={23} />
+                  <NF label="End hour (0–23)" value={form.sendWindowEnd} onChange={v => set('sendWindowEnd', v)} min={0} max={23} />
+                </div>
+                <div style={{ marginTop: 14 }}>
+                  <TF label="Active days" value={form.sendWindowDays} onChange={v => set('sendWindowDays', v)}
+                    placeholder="Mon,Tue,Wed,Thu,Fri" />
+                </div>
               </div>
-            </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <TF label="Timezone" value={form.tz} onChange={v => set('tz', v)} placeholder="Asia/Kolkata" />
-              <NF label="Daily cap (emails)" value={form.dailyCap} onChange={v => set('dailyCap', v)} min={1} />
-            </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+                <TF label="Timezone" value={form.tz} onChange={v => set('tz', v)} placeholder="Asia/Kolkata" />
+                <NF label="Daily cap" value={form.dailyCap} onChange={v => set('dailyCap', v)} min={1} />
+              </div>
 
-            <button
-              type="submit"
-              disabled={submitting}
-              className="w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold text-sm hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {submitting ? 'Creating…' : 'Create Campaign'}
-            </button>
+              <button
+                type="submit" disabled={submitting}
+                style={{
+                  width: '100%', background: submitting ? 'rgba(99,102,241,0.4)' : 'var(--indigo)',
+                  color: '#fff', border: 'none', borderRadius: 9,
+                  padding: '12px 0', fontSize: 14, fontWeight: 600,
+                  cursor: submitting ? 'not-allowed' : 'pointer',
+                  marginTop: 4, fontFamily: 'inherit',
+                  transition: 'opacity 0.15s',
+                }}
+                onMouseOver={e => { if (!submitting) e.currentTarget.style.opacity = '0.85'; }}
+                onMouseOut={e => { e.currentTarget.style.opacity = '1'; }}
+              >
+                {submitting ? 'Creating…' : 'Create Campaign'}
+              </button>
+
+            </div>
           </form>
         </div>
       </div>
-    </main>
+    </div>
   );
 }
