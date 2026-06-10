@@ -169,7 +169,7 @@ export default function CampaignPage() {
               onClick={launch} disabled={launching}
               style={{
                 background: launching ? 'rgba(16,185,129,0.3)' : 'var(--emerald)',
-                color: '#000', border: 'none', padding: '7px 16px',
+                color: 'var(--bg)', border: 'none', padding: '7px 16px',
                 borderRadius: 7, fontSize: 12, fontWeight: 700,
                 cursor: launching ? 'not-allowed' : 'pointer', fontFamily: 'inherit',
               }}
