@@ -33,7 +33,6 @@
 @theme inline {
   --color-background: var(--bg);
   --color-foreground: var(--text);
-  --font-outfit: var(--font-outfit);
 }
 
 html, body {

@@ -29,7 +29,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${outfit.variable} ${fraunces.variable} ${dmMono.variable} h-full antialiased`}>
-      <body style={{ fontFamily: "var(--font-ui)", background: "var(--bg)", minHeight: "100vh" }}>
+      <body style={{ minHeight: "100vh" }}>
         {/* Global topbar */}
         <header style={{
           background: "var(--surface)",
