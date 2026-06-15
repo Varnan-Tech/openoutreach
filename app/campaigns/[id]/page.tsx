@@ -144,15 +144,19 @@ export default function CampaignPage() {
 
   function exportCSV() {
     if (!recipients.length) return;
+    const escapeCSV = (val: string) =>
+      val.includes(',') || val.includes('"') || val.includes('\n') || val.includes('\r')
+        ? `"${val.replace(/"/g, '""')}"` : val;
     const dataKeys = Array.from(
       new Set(recipients.flatMap(r => Object.keys((r.data as Record<string, string>) ?? {})))
     );
-    const headers = ['email', 'stage', 'currentStep', ...dataKeys];
+    const rawHeaders = ['email', 'stage', 'currentStep', ...dataKeys];
+    const headers = rawHeaders.map(escapeCSV);
     const rows = recipients.map(r => {
       const d = (r.data as Record<string, string>) ?? {};
-      return headers.map(h => {
+      return rawHeaders.map(h => {
         const val = h === 'email' ? r.email : h === 'stage' ? r.stage : h === 'currentStep' ? String(r.currentStep) : (d[h] ?? '');
-        return val.includes(',') || val.includes('"') ? `"${val.replace(/"/g, '""')}"` : val;
+        return escapeCSV(val);
       }).join(',');
     });
     const csv = [headers.join(','), ...rows].join('\n');
