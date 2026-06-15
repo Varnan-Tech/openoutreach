@@ -45,10 +45,12 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ id: st
       scheduledSends: { select: { opens: true, lastOpenedAt: true, status: true } },
     },
   });
-  return NextResponse.json(recipients.map(r => ({
+  type SendRow = { opens: number; lastOpenedAt: Date | null; status: string };
+  type RecipientRow = (typeof recipients)[number];
+  return NextResponse.json(recipients.map((r: RecipientRow) => ({
     ...r,
-    _opens: r.scheduledSends.reduce((sum, s) => sum + s.opens, 0),
-    _lastOpenedAt: r.scheduledSends.reduce((latest: Date | null, s) =>
+    _opens: r.scheduledSends.reduce((sum: number, s: SendRow) => sum + s.opens, 0),
+    _lastOpenedAt: r.scheduledSends.reduce((latest: Date | null, s: SendRow) =>
       s.lastOpenedAt && (!latest || s.lastOpenedAt > latest) ? s.lastOpenedAt : latest, null),
     scheduledSends: undefined,
   })));
