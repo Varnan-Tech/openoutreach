@@ -51,6 +51,14 @@ export default function CampaignPage() {
   const [detailLoading, setDetailLoading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [showAddLead, setShowAddLead] = useState(false);
+  const [singleLead, setSingleLead] = useState<Record<string, string>>({ email: '' });
+  const [addingLead, setAddingLead] = useState(false);
+  const [newFieldName, setNewFieldName] = useState('');
+  const bodyRef = useRef<HTMLTextAreaElement>(null);
+  const editBodyRef = useRef<HTMLTextAreaElement>(null);
+  const [editDraft, setEditDraft] = useState<{ id: string; subject: string; bodyText: string; delayDays: number }>({ id: '', subject: '', bodyText: '', delayDays: 0 });
+  const [savingStep, setSavingStep] = useState(false);
   function toggleSelect(rid: string) {
     setSelectedIds(prev => {
       const next = new Set(prev);
@@ -209,6 +217,32 @@ export default function CampaignPage() {
     setUploading(false);
   }
 
+  async function addSingleLead(e: React.FormEvent) {
+    e.preventDefault();
+    if (!singleLead.email?.trim()) return;
+    setAddingLead(true);
+    const keys = Object.keys(singleLead);
+    const csvHeader = keys.join(',');
+    const csvRow = keys.map(k => {
+      const v = singleLead[k] ?? '';
+      return v.includes(',') || v.includes('"') || v.includes('\n') ? `"${v.replace(/"/g, '""')}"` : v;
+    }).join(',');
+    const res = await fetch(`/api/campaigns/${id}/recipients`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ csv: `${csvHeader}\n${csvRow}` }),
+    });
+    const data = await res.json();
+    if (res.ok) {
+      flash(`Lead added`, 'ok');
+      setSingleLead({ email: '' });
+      setNewFieldName('');
+      setShowAddLead(false);
+      reload();
+    } else flash(data.error ?? 'Failed to add lead', 'error');
+    setAddingLead(false);
+  }
+
   // ─── Derived stats ──────────────────────────────────────────────────────────
   const counts: Record<string, number> = {};
   KANBAN_STAGES.forEach(s => { counts[s.id] = recipients.filter(r => r.stage === s.id).length; });
@@ -216,6 +250,54 @@ export default function CampaignPage() {
   const openRate  = totalSent > 0 ? (((counts.opened || 0) + (counts.replied || 0)) / totalSent * 100).toFixed(1) : '—';
   const replyRate = totalSent > 0 ? ((counts.replied || 0) / totalSent * 100).toFixed(1) : '—';
   const sc = STATUS_CFG[campaign?.status] ?? STATUS_CFG.draft;
+  const dataKeys = Array.from(new Set(recipients.flatMap(r => Object.keys((r.data as Record<string, string>) ?? {}))));
+  // insert {{var}} at textarea cursor
+  function insertVar(key: string) {
+    const ta = bodyRef.current;
+    if (!ta) return;
+    const start = ta.selectionStart ?? ta.value.length;
+    const end = ta.selectionEnd ?? ta.value.length;
+    const token = `{{${key}}}`;
+    const next = ta.value.slice(0, start) + token + ta.value.slice(end);
+    setDraft(d => ({ ...d, bodyText: next }));
+    setTimeout(() => { ta.focus(); ta.setSelectionRange(start + token.length, start + token.length); }, 0);
+  }
+
+  function insertVarEdit(key: string) {
+    const ta = editBodyRef.current;
+    if (!ta) return;
+    const start = ta.selectionStart ?? ta.value.length;
+    const end = ta.selectionEnd ?? ta.value.length;
+    const token = `{{${key}}}`;
+    const next = ta.value.slice(0, start) + token + ta.value.slice(end);
+    setEditDraft(d => ({ ...d, bodyText: next }));
+    setTimeout(() => { ta.focus(); ta.setSelectionRange(start + token.length, start + token.length); }, 0);
+  }
+
+  async function updateStep(e: React.FormEvent) {
+    e.preventDefault();
+    setSavingStep(true);
+    const html = editDraft.bodyText.split('\n\n').map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
+    const res = await fetch(`/api/campaigns/${id}/steps`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id: editDraft.id,
+        subjectTemplate: editDraft.subject,
+        bodyHtmlTemplate: html,
+        bodyTextTemplate: editDraft.bodyText,
+        delayDaysFromPrevious: editDraft.delayDays,
+      }),
+    });
+    const data = await res.json();
+    if (res.ok) {
+      flash('Step saved', 'ok');
+      setSelectedStep(null);
+      setShowSteps(true);
+      reload();
+    } else flash(data.error ?? 'Failed to save', 'error');
+    setSavingStep(false);
+  }
 
   if (!campaign) return (
     <div style={{ background: 'var(--bg)', minHeight: 'calc(100vh - 52px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -271,28 +353,24 @@ export default function CampaignPage() {
             <span style={{ fontSize: 11, color: 'var(--muted)', fontFamily: 'var(--font-mono)' }}>{campaign.fromEmail}</span>
             <button
               onClick={() => setShowSteps(s => !s)}
-              title="Sequence steps"
               style={{
                 background: showSteps ? 'rgba(255,255,255,0.09)' : 'rgba(255,255,255,0.04)',
                 border: `1px solid ${showSteps ? 'var(--border-2)' : 'rgba(255,255,255,0.12)'}`,
-                borderRadius: 6, width: 30, height: 30,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                borderRadius: 6, height: 30, padding: '0 12px',
+                display: 'flex', alignItems: 'center', gap: 6,
                 cursor: 'pointer', color: showSteps ? 'var(--text)' : 'var(--muted)',
-                fontSize: 13, transition: 'all 0.15s', flexShrink: 0,
-                position: 'relative',
+                fontSize: 11, fontWeight: 600, fontFamily: 'var(--font-mono)',
+                transition: 'all 0.15s', flexShrink: 0, position: 'relative',
               }}
               onMouseOver={e => { e.currentTarget.style.borderColor = 'var(--border-2)'; e.currentTarget.style.color = 'var(--text)'; }}
               onMouseOut={e => { if (!showSteps) { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'; e.currentTarget.style.color = 'var(--muted)'; } }}
             >
-              ✉
+              Email Template & Follow-up
               {steps.length > 0 && (
                 <span style={{
-                  position: 'absolute', top: -5, right: -5,
                   background: '#6366F1', color: '#fff',
-                  fontSize: 8, fontWeight: 700, fontFamily: 'var(--font-mono)',
-                  width: 14, height: 14, borderRadius: '50%',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  border: '1px solid var(--surface)',
+                  fontSize: 9, fontWeight: 700, fontFamily: 'var(--font-mono)',
+                  padding: '1px 5px', borderRadius: 8,
                 }}>
                   {steps.length}
                 </span>
@@ -300,35 +378,51 @@ export default function CampaignPage() {
             </button>
             <button
               onClick={() => setShowUpload(s => !s)}
-              title="Upload recipients"
               style={{
                 background: showUpload ? 'rgba(255,255,255,0.09)' : 'rgba(255,255,255,0.04)',
                 border: `1px solid ${showUpload ? 'var(--border-2)' : 'rgba(255,255,255,0.12)'}`,
-                borderRadius: 6, width: 30, height: 30,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                borderRadius: 6, height: 30, padding: '0 12px',
+                display: 'flex', alignItems: 'center',
                 cursor: 'pointer', color: showUpload ? 'var(--text)' : 'var(--muted)',
-                fontSize: 13, transition: 'all 0.15s', flexShrink: 0,
+                fontSize: 11, fontWeight: 600, fontFamily: 'var(--font-mono)',
+                transition: 'all 0.15s', flexShrink: 0,
               }}
               onMouseOver={e => { e.currentTarget.style.borderColor = 'var(--border-2)'; e.currentTarget.style.color = 'var(--text)'; }}
               onMouseOut={e => { if (!showUpload) { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'; e.currentTarget.style.color = 'var(--muted)'; } }}
             >
-              ↑
+              Import CSV
+            </button>
+            <button
+              onClick={() => setShowAddLead(s => !s)}
+              style={{
+                background: showAddLead ? 'rgba(99,102,241,0.15)' : 'rgba(255,255,255,0.04)',
+                border: `1px solid ${showAddLead ? 'rgba(99,102,241,0.4)' : 'rgba(255,255,255,0.12)'}`,
+                borderRadius: 6, height: 30, padding: '0 12px',
+                display: 'flex', alignItems: 'center',
+                cursor: 'pointer', color: showAddLead ? '#818CF8' : 'var(--muted)',
+                fontSize: 11, fontWeight: 600, fontFamily: 'var(--font-mono)',
+                transition: 'all 0.15s', flexShrink: 0,
+              }}
+              onMouseOver={e => { e.currentTarget.style.borderColor = 'rgba(99,102,241,0.4)'; e.currentTarget.style.color = '#818CF8'; }}
+              onMouseOut={e => { if (!showAddLead) { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'; e.currentTarget.style.color = 'var(--muted)'; } }}
+            >
+              + Add Lead
             </button>
             <button
               onClick={() => setShowSettings(s => !s)}
-              title="Campaign settings"
               style={{
                 background: showSettings ? 'rgba(255,255,255,0.09)' : 'rgba(255,255,255,0.04)',
                 border: `1px solid ${showSettings ? 'var(--border-2)' : 'rgba(255,255,255,0.12)'}`,
-                borderRadius: 6, width: 30, height: 30,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                borderRadius: 6, height: 30, padding: '0 12px',
+                display: 'flex', alignItems: 'center',
                 cursor: 'pointer', color: showSettings ? 'var(--text)' : 'var(--muted)',
-                fontSize: 14, transition: 'all 0.15s', flexShrink: 0,
+                fontSize: 11, fontWeight: 600, fontFamily: 'var(--font-mono)',
+                transition: 'all 0.15s', flexShrink: 0,
               }}
               onMouseOver={e => { e.currentTarget.style.borderColor = 'var(--border-2)'; e.currentTarget.style.color = 'var(--text)'; }}
               onMouseOut={e => { if (!showSettings) { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'; e.currentTarget.style.color = 'var(--muted)'; } }}
             >
-              ⚙
+              Settings
             </button>
             {(campaign.status === 'active' || campaign.status === 'paused') && (
               <button
@@ -727,8 +821,6 @@ export default function CampaignPage() {
               {' '}column. Extra columns become{' '}
               <code style={{ fontFamily: 'var(--font-mono)', background: 'rgba(255,255,255,0.07)', padding: '1px 6px', borderRadius: 3, fontSize: 10, color: 'var(--text)' }}>{`{{merge_variables}}`}</code>.
             </div>
-
-            {/* Drop zone */}
             <input ref={fileRef} type="file" accept=".csv" style={{ display: 'none' }}
               onChange={e => { const f = e.target.files?.[0]; if (f) { uploadCSV(f); setShowUpload(false); } e.target.value = ''; }} />
             <button
@@ -749,11 +841,111 @@ export default function CampaignPage() {
               <span style={{ fontSize: 22, opacity: 0.5 }}>↑</span>
               <span>{uploading ? 'uploading···' : 'click to upload .csv'}</span>
             </button>
-
-            {/* Current count */}
             <div style={{ marginTop: 14, fontSize: 10, color: 'var(--dim)', fontFamily: 'var(--font-mono)', textAlign: 'center' }}>
               {recipients.length} recipient{recipients.length !== 1 ? 's' : ''} already loaded
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add Lead Modal */}
+      {showAddLead && (
+        <div
+          onClick={() => { setShowAddLead(false); setSingleLead({ email: '' }); setNewFieldName(''); }}
+          style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+        >
+          <div onClick={e => e.stopPropagation()} style={{ background: 'var(--surface)', border: '1px solid var(--border-2)', borderRadius: 16, padding: '24px 26px', width: 460, maxWidth: 'calc(100vw - 40px)', boxShadow: '0 24px 60px rgba(0,0,0,0.5)', maxHeight: '80vh', overflowY: 'auto' }}>
+            {/* Header */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+              <div>
+                <div style={{ fontSize: 9, fontWeight: 700, color: 'var(--indigo)', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'var(--font-mono)', marginBottom: 3 }}>
+                  Add Lead
+                </div>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: 16, fontWeight: 400, color: 'var(--text)' }}>
+                  {campaign.name}
+                </div>
+              </div>
+              <button
+                onClick={() => { setShowAddLead(false); setSingleLead({ email: '' }); setNewFieldName(''); }}
+                style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 6, width: 28, height: 28, cursor: 'pointer', color: 'var(--dim)', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.12s' }}
+                onMouseOver={e => { e.currentTarget.style.borderColor = 'var(--border-2)'; e.currentTarget.style.color = 'var(--text)'; }}
+                onMouseOut={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--dim)'; }}
+              >✕</button>
+            </div>
+
+            <form onSubmit={addSingleLead} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {/* email */}
+              <div>
+                <label style={{ fontSize: 9, fontWeight: 700, color: 'var(--dim)', marginBottom: 5, display: 'block', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'var(--font-mono)' }}>Email *</label>
+                <input type="email" required style={iStyle} placeholder="lead@company.com"
+                  value={singleLead.email ?? ''}
+                  onChange={e => setSingleLead(p => ({ ...p, email: e.target.value }))}
+                  onFocus={e => (e.target.style.borderColor = 'rgba(99,102,241,0.4)')}
+                  onBlur={e => (e.target.style.borderColor = 'var(--border-2)')} />
+              </div>
+
+              {/* existing dataKeys fields */}
+              {dataKeys.filter(k => k.toLowerCase() !== 'email').map(key => (
+                <div key={key}>
+                  <label style={{ fontSize: 9, fontWeight: 700, color: 'var(--dim)', marginBottom: 5, display: 'block', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'var(--font-mono)' }}>{key}</label>
+                  <input type="text" style={iStyle} placeholder={`{{${key}}}`}
+                    value={singleLead[key] ?? ''}
+                    onChange={e => setSingleLead(p => ({ ...p, [key]: e.target.value }))}
+                    onFocus={e => (e.target.style.borderColor = 'rgba(99,102,241,0.4)')}
+                    onBlur={e => (e.target.style.borderColor = 'var(--border-2)')} />
+                </div>
+              ))}
+
+              {/* new custom fields added this session */}
+              {Object.keys(singleLead).filter(k => k !== 'email' && !dataKeys.includes(k)).map(key => (
+                <div key={key} style={{ display: 'flex', gap: 8, alignItems: 'flex-end' }}>
+                  <div style={{ flex: 1 }}>
+                    <label style={{ fontSize: 9, fontWeight: 700, color: '#818CF8', marginBottom: 5, display: 'block', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'var(--font-mono)' }}>{key} <span style={{ opacity: 0.6 }}>· new</span></label>
+                    <input type="text" style={iStyle} placeholder={`{{${key}}}`}
+                      value={singleLead[key] ?? ''}
+                      onChange={e => setSingleLead(p => ({ ...p, [key]: e.target.value }))}
+                      onFocus={e => (e.target.style.borderColor = 'rgba(99,102,241,0.4)')}
+                      onBlur={e => (e.target.style.borderColor = 'var(--border-2)')} />
+                  </div>
+                  <button type="button" onClick={() => setSingleLead(p => { const n = { ...p }; delete n[key]; return n; })}
+                    style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 6, width: 32, height: 36, cursor: 'pointer', color: 'var(--dim)', fontSize: 13, flexShrink: 0 }}>✕</button>
+                </div>
+              ))}
+
+              {/* add new variable */}
+              <div style={{ borderTop: '1px solid var(--border)', paddingTop: 12 }}>
+                <div style={{ fontSize: 9, fontWeight: 700, color: 'var(--dim)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'var(--font-mono)' }}>Add variable</div>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <input type="text" style={{ ...iStyle, flex: 1 }} placeholder="e.g. company, title, city"
+                    value={newFieldName}
+                    onChange={e => setNewFieldName(e.target.value.replace(/\s/g, '_').toLowerCase())}
+                    onFocus={e => (e.target.style.borderColor = 'rgba(99,102,241,0.4)')}
+                    onBlur={e => (e.target.style.borderColor = 'var(--border-2)')}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const k = newFieldName.trim();
+                        if (k && k !== 'email' && !(k in singleLead)) { setSingleLead(p => ({ ...p, [k]: '' })); }
+                        setNewFieldName('');
+                      }
+                    }} />
+                  <button type="button"
+                    onClick={() => { const k = newFieldName.trim(); if (k && k !== 'email' && !(k in singleLead)) { setSingleLead(p => ({ ...p, [k]: '' })); } setNewFieldName(''); }}
+                    style={{ background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.2)', borderRadius: 6, padding: '0 14px', fontSize: 13, color: '#818CF8', cursor: 'pointer', flexShrink: 0, fontWeight: 600 }}>
+                    +
+                  </button>
+                </div>
+              </div>
+
+              <button type="submit" disabled={addingLead} style={{
+                background: addingLead ? 'rgba(99,102,241,0.4)' : 'var(--indigo)',
+                color: '#fff', border: 'none', borderRadius: 8, padding: '10px 0',
+                fontSize: 12, fontWeight: 700, cursor: addingLead ? 'not-allowed' : 'pointer',
+                fontFamily: 'var(--font-mono)', letterSpacing: '0.05em', textTransform: 'uppercase', marginTop: 4,
+              }}>
+                {addingLead ? 'Adding···' : '+ Add Lead'}
+              </button>
+            </form>
           </div>
         </div>
       )}
@@ -789,7 +981,7 @@ export default function CampaignPage() {
             }}>
               <div>
                 <div style={{ fontSize: 9, fontWeight: 700, color: 'var(--indigo)', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'var(--font-mono)', marginBottom: 3 }}>
-                  Sequence Steps
+                  Email Template & Follow-up
                 </div>
                 <div style={{ fontFamily: 'var(--font-display)', fontSize: 16, fontWeight: 400, color: 'var(--text)' }}>
                   {campaign.name}
@@ -826,6 +1018,24 @@ export default function CampaignPage() {
               </div>
             </div>
 
+            {/* Variables bar */}
+            {dataKeys.length > 0 && (
+              <div style={{ padding: '10px 14px', borderBottom: '1px solid var(--border)', background: 'rgba(99,102,241,0.04)', flexShrink: 0 }}>
+                <div style={{ fontSize: 9, fontWeight: 700, color: 'var(--dim)', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'var(--font-mono)' }}>Available variables</div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
+                  {dataKeys.map(key => (
+                    <span key={key} style={{
+                      background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.2)',
+                      borderRadius: 5, padding: '2px 8px', fontSize: 10, fontWeight: 600,
+                      color: '#818CF8', fontFamily: 'var(--font-mono)',
+                    }}>
+                      {`{{${key}}}`}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Steps list */}
             <div style={{ flex: 1, overflowY: 'auto', padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: 8 }}>
               {steps.length === 0 && !showAddStep && (
@@ -839,7 +1049,7 @@ export default function CampaignPage() {
                 return (
                   <div
                     key={step.id}
-                    onClick={() => { setShowSteps(false); setSelectedStep(step); }}
+                    onClick={() => { setShowSteps(false); setSelectedStep(step); setEditDraft({ id: step.id, subject: step.subjectTemplate ?? '', bodyText: step.bodyTextTemplate ?? '', delayDays: step.delayDaysFromPrevious ?? 0 }); }}
                     style={{
                       background: 'var(--surface-2)', border: '1px solid var(--border)',
                       borderRadius: 10, padding: '13px 14px', cursor: 'pointer',
@@ -920,7 +1130,24 @@ export default function CampaignPage() {
                     <label style={{ fontSize: 9, fontWeight: 700, color: 'var(--dim)', marginBottom: 5, display: 'block', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'var(--font-mono)' }}>
                       Body — use {`{{variable}}`} for merge fields
                     </label>
-                    <textarea required rows={5} style={{ ...iStyle, resize: 'none' as const }}
+                    {dataKeys.length > 0 && (
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginBottom: 8 }}>
+                        {dataKeys.map(key => (
+                          <button key={key} type="button" onClick={() => insertVar(key)} style={{
+                            background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.2)',
+                            borderRadius: 5, padding: '3px 8px', fontSize: 10, fontWeight: 600,
+                            color: '#818CF8', cursor: 'pointer', fontFamily: 'var(--font-mono)',
+                            transition: 'all 0.1s',
+                          }}
+                          onMouseOver={e => { e.currentTarget.style.background = 'rgba(99,102,241,0.2)'; e.currentTarget.style.borderColor = 'rgba(99,102,241,0.4)'; }}
+                          onMouseOut={e => { e.currentTarget.style.background = 'rgba(99,102,241,0.1)'; e.currentTarget.style.borderColor = 'rgba(99,102,241,0.2)'; }}
+                          >
+                            {`{{${key}}}`}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                    <textarea ref={bodyRef} required rows={5} style={{ ...iStyle, resize: 'none' as const }}
                       placeholder={"Hi {{first_name}},\n\nYour message here...\n\nBest,\nYour Name"}
                       value={draft.bodyText} onChange={e => setDraft(d => ({ ...d, bodyText: e.target.value }))}
                       onFocus={e => (e.target.style.borderColor = 'rgba(99,102,241,0.4)')}
@@ -1013,53 +1240,71 @@ export default function CampaignPage() {
               </button>
             </div>
 
-            {/* Email chrome */}
-            <div style={{ flex: 1, overflowY: 'auto', padding: '16px 20px' }}>
-              {/* Subject */}
-              <div style={{
-                background: 'rgba(255,255,255,0.03)',
-                border: '1px solid rgba(255,255,255,0.07)',
-                borderRadius: 9, overflow: 'hidden', marginBottom: 12,
-              }}>
-                <div style={{
-                  padding: '8px 13px',
-                  borderBottom: '1px solid rgba(255,255,255,0.05)',
-                  display: 'flex', gap: 10, alignItems: 'center',
-                }}>
-                  <span style={{ fontSize: 9, color: 'var(--dim)', fontFamily: 'var(--font-mono)', textTransform: 'uppercase', letterSpacing: '0.08em', flexShrink: 0 }}>Subject</span>
-                  <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--text)' }}>
-                    {selectedStep.subjectTemplate || '(no subject)'}
-                  </span>
-                </div>
-                {/* Fake from line */}
-                <div style={{ padding: '7px 13px', display: 'flex', gap: 10, alignItems: 'center' }}>
-                  <span style={{ fontSize: 9, color: 'var(--dim)', fontFamily: 'var(--font-mono)', textTransform: 'uppercase', letterSpacing: '0.08em', flexShrink: 0 }}>From</span>
-                  <span style={{ fontSize: 11, color: 'var(--muted)', fontFamily: 'var(--font-mono)' }}>{campaign.fromEmail}</span>
+            {/* Variables bar */}
+            {dataKeys.length > 0 && (
+              <div style={{ padding: '10px 20px', borderBottom: '1px solid var(--border)', background: 'rgba(99,102,241,0.04)', flexShrink: 0 }}>
+                <div style={{ fontSize: 9, fontWeight: 700, color: 'var(--dim)', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'var(--font-mono)' }}>Available variables — click to insert</div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
+                  {dataKeys.map(key => (
+                    <button key={key} type="button" onClick={() => insertVarEdit(key)} style={{
+                      background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.2)',
+                      borderRadius: 5, padding: '2px 8px', fontSize: 10, fontWeight: 600,
+                      color: '#818CF8', cursor: 'pointer', fontFamily: 'var(--font-mono)', transition: 'all 0.1s',
+                    }}
+                    onMouseOver={e => { e.currentTarget.style.background = 'rgba(99,102,241,0.2)'; e.currentTarget.style.borderColor = 'rgba(99,102,241,0.4)'; }}
+                    onMouseOut={e => { e.currentTarget.style.background = 'rgba(99,102,241,0.1)'; e.currentTarget.style.borderColor = 'rgba(99,102,241,0.2)'; }}
+                    >
+                      {`{{${key}}}`}
+                    </button>
+                  ))}
                 </div>
               </div>
+            )}
 
-              {/* Body */}
-              <div style={{
-                background: 'rgba(255,255,255,0.02)',
-                border: '1px solid rgba(255,255,255,0.06)',
-                borderRadius: 9, padding: '14px 16px',
-                fontSize: 13, color: 'var(--muted)',
-                lineHeight: 1.75, whiteSpace: 'pre-wrap',
-                fontFamily: 'var(--font-ui)',
-              }}>
-                {(selectedStep.bodyTextTemplate ?? '').split(/({{[^}]+}})/).map((part: string, i: number) =>
-                  /^{{/.test(part) ? (
-                    <span key={i} style={{
-                      color: '#6366F1', background: 'rgba(99,102,241,0.1)',
-                      borderRadius: 3, padding: '0 3px',
-                      fontFamily: 'var(--font-mono)', fontSize: 12,
-                    }}>{part}</span>
-                  ) : (
-                    <span key={i}>{part}</span>
-                  )
-                )}
+            {/* Edit form */}
+            <form onSubmit={updateStep} style={{ flex: 1, overflowY: 'auto', padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 12 }}>
+                <div>
+                  <label style={{ fontSize: 9, fontWeight: 700, color: 'var(--dim)', marginBottom: 5, display: 'block', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'var(--font-mono)' }}>Subject</label>
+                  <input type="text" required style={iStyle} placeholder="Hey {{first_name}}!"
+                    value={editDraft.subject}
+                    onChange={e => setEditDraft(d => ({ ...d, subject: e.target.value }))}
+                    onFocus={e => (e.target.style.borderColor = 'rgba(99,102,241,0.4)')}
+                    onBlur={e => (e.target.style.borderColor = 'var(--border-2)')} />
+                </div>
+                <div>
+                  <label style={{ fontSize: 9, fontWeight: 700, color: 'var(--dim)', marginBottom: 5, display: 'block', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'var(--font-mono)' }}>Delay (days)</label>
+                  <input type="number" min={0} style={iStyle}
+                    value={editDraft.delayDays}
+                    onChange={e => setEditDraft(d => ({ ...d, delayDays: Number(e.target.value) }))}
+                    onFocus={e => (e.target.style.borderColor = 'rgba(99,102,241,0.4)')}
+                    onBlur={e => (e.target.style.borderColor = 'var(--border-2)')} />
+                </div>
               </div>
-            </div>
+              <div style={{ flex: 1 }}>
+                <label style={{ fontSize: 9, fontWeight: 700, color: 'var(--dim)', marginBottom: 5, display: 'block', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'var(--font-mono)' }}>Body</label>
+                <textarea ref={editBodyRef} required rows={10} style={{ ...iStyle, resize: 'none' as const }}
+                  placeholder={"Hi {{first_name}},\n\nYour message here...\n\nBest,\nYour Name"}
+                  value={editDraft.bodyText}
+                  onChange={e => setEditDraft(d => ({ ...d, bodyText: e.target.value }))}
+                  onFocus={e => (e.target.style.borderColor = 'rgba(99,102,241,0.4)')}
+                  onBlur={e => (e.target.style.borderColor = 'var(--border-2)')} />
+              </div>
+              <div style={{ display: 'flex', gap: 10, paddingBottom: 4 }}>
+                <button type="submit" disabled={savingStep} style={{
+                  background: savingStep ? 'rgba(99,102,241,0.4)' : 'var(--indigo)', color: '#fff', border: 'none',
+                  padding: '9px 20px', borderRadius: 7, fontSize: 12, fontWeight: 700,
+                  cursor: savingStep ? 'not-allowed' : 'pointer', fontFamily: 'var(--font-mono)',
+                  letterSpacing: '0.04em', textTransform: 'uppercase',
+                }}>
+                  {savingStep ? 'Saving···' : 'Save Step'}
+                </button>
+                <button type="button" onClick={() => { setSelectedStep(null); setShowSteps(true); }}
+                  style={{ background: 'none', border: 'none', padding: '9px 14px', fontSize: 12, fontWeight: 500, color: 'var(--muted)', cursor: 'pointer' }}>
+                  Cancel
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

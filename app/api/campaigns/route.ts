@@ -24,12 +24,13 @@ export async function POST(req: NextRequest) {
     unosendApiKey?: string; sendWindowStart?: number; sendWindowEnd?: number;
     sendWindowDays?: string; tz?: string; dailyCap?: number;
   };
-  if (!name || !fromEmail || !unosendApiKey) {
-    return NextResponse.json({ error: 'name, fromEmail, unosendApiKey required' }, { status: 400 });
+  const cleanEmail = (fromEmail ?? '').trim();
+  if (!name || !cleanEmail) {
+    return NextResponse.json({ error: 'name and fromEmail required' }, { status: 400 });
   }
   const campaign = await prisma.campaign.create({
-    data: { name, fromEmail, fromName: fromName ?? '', fromDomain: fromDomain ?? '',
-            unosendApiKey, sendWindowStart, sendWindowEnd, sendWindowDays, tz, dailyCap },
+    data: { name, fromEmail: cleanEmail, fromName: fromName ?? '', fromDomain: fromDomain ?? cleanEmail.split('@')[1] ?? '',
+            unosendApiKey: unosendApiKey ?? '', sendWindowStart, sendWindowEnd, sendWindowDays, tz, dailyCap },
   });
   return NextResponse.json(campaign, { status: 201 });
 }

@@ -89,7 +89,8 @@ export default function NewCampaign() {
     e.preventDefault();
     setSubmitting(true);
     setError('');
-    const payload = { ...form, fromDomain: form.fromEmail.split('@')[1] ?? '' };
+    const trimmedEmail = form.fromEmail.trim();
+    const payload = { ...form, fromEmail: trimmedEmail, fromDomain: trimmedEmail.split('@')[1] ?? '' };
     const res = await fetch('/api/campaigns', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -142,8 +143,15 @@ export default function NewCampaign() {
                   placeholder="Paras" required />
               </div>
 
-              <TF label="Autosend API key" value={form.unosendApiKey} onChange={v => set('unosendApiKey', v)}
-                placeholder="AS_..." required />
+              <div>
+                <TF label="Autosend API key (optional)" value={form.unosendApiKey} onChange={v => set('unosendApiKey', v)}
+                  placeholder="AS_… (leave blank to use default from env)" />
+                {!form.unosendApiKey && (
+                  <p style={{ margin: '5px 0 0', fontSize: 11, color: 'var(--muted)', fontFamily: 'var(--font-mono)' }}>
+                    ✓ Default key from <code style={{ color: 'var(--indigo)', background: 'rgba(99,102,241,0.08)', padding: '1px 5px', borderRadius: 4 }}>AUTOSEND_API_KEY</code> env will be used
+                  </p>
+                )}
+              </div>
 
               <div style={{ borderTop: '1px solid var(--border)', paddingTop: 18 }}>
                 <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--dim)', marginBottom: 14, textTransform: 'uppercase', letterSpacing: '0.09em', fontFamily: 'var(--font-mono)' }}>
