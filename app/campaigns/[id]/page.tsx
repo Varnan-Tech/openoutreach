@@ -189,10 +189,8 @@ export default function CampaignPage() {
     const results = await Promise.all([...selectedIds].map(rid =>
       fetch(`/api/campaigns/${id}/recipients/${rid}`, { method: 'DELETE' })
     ));
-    if (!results.every(r => r.ok)) {
-      flash('Some deletions failed', 'error');
-      return;
-    }
+    if (detailRecipient && selectedIds.has(detailRecipient.id)) setDetailRecipient(null);
+    if (!results.every(r => r.ok)) flash('Some deletions failed', 'error');
     setSelectedIds(new Set());
     reload();
   }
