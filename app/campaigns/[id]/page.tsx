@@ -142,6 +142,27 @@ export default function CampaignPage() {
     else flash('Failed to update campaign status', 'error');
   }
 
+  function exportCSV() {
+    if (!recipients.length) return;
+    const dataKeys = Array.from(
+      new Set(recipients.flatMap(r => Object.keys((r.data as Record<string, string>) ?? {})))
+    );
+    const headers = ['email', 'stage', 'currentStep', ...dataKeys];
+    const rows = recipients.map(r => {
+      const d = (r.data as Record<string, string>) ?? {};
+      return headers.map(h => {
+        const val = h === 'email' ? r.email : h === 'stage' ? r.stage : h === 'currentStep' ? String(r.currentStep) : (d[h] ?? '');
+        return val.includes(',') || val.includes('"') ? `"${val.replace(/"/g, '""')}"` : val;
+      }).join(',');
+    });
+    const csv = [headers.join(','), ...rows].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `${campaign.name.replace(/\s+/g, '-')}-recipients.csv`;
+    a.click(); URL.revokeObjectURL(url);
+  }
+
   async function uploadCSV(file: File) {
     setUploading(true);
     const text = await file.text();
@@ -400,6 +421,22 @@ export default function CampaignPage() {
               </span>
               <span style={{ fontSize: 9, color: 'var(--border-2)', fontFamily: 'var(--font-mono)' }}>—</span>
               <span style={{ fontSize: 9, color: 'var(--muted)', fontFamily: 'var(--font-mono)' }}>{recipients.length} total</span>
+              <div style={{ flex: 1 }} />
+              {recipients.length > 0 && (
+                <button
+                  onClick={exportCSV}
+                  style={{
+                    background: 'none', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 5,
+                    padding: '3px 10px', fontSize: 9, fontWeight: 700, color: 'var(--muted)',
+                    cursor: 'pointer', fontFamily: 'var(--font-mono)', letterSpacing: '0.06em',
+                    textTransform: 'uppercase' as const, transition: 'all 0.12s',
+                  }}
+                  onMouseOver={e => { e.currentTarget.style.borderColor = 'rgba(99,102,241,0.4)'; e.currentTarget.style.color = '#818CF8'; }}
+                  onMouseOut={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = 'var(--muted)'; }}
+                >
+                  ↓ Export CSV
+                </button>
+              )}
             </div>
             <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 8, alignItems: 'flex-start' }}>
               {KANBAN_STAGES.map((stage, idx) => {
