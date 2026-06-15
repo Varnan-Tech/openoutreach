@@ -63,6 +63,7 @@ export default function CampaignPage() {
     fetch(`/api/campaigns/${id}`).then(r => r.ok ? r.json() : null).then(d => { if (d) setCampaign(d); });
     fetch(`/api/campaigns/${id}/recipients`).then(r => r.ok ? r.json() : []).then(setRecipients);
     fetch(`/api/campaigns/${id}/steps`).then(r => r.ok ? r.json() : []).then(setSteps);
+    setSelectedIds(new Set());
   }, [id]);
 
   useEffect(() => { if (id) reload(); }, [id, reload]);
@@ -185,9 +186,13 @@ export default function CampaignPage() {
   async function deleteSelected() {
     if (!selectedIds.size) return;
     if (!confirm(`Delete ${selectedIds.size} recipient(s)? This cannot be undone.`)) return;
-    await Promise.all([...selectedIds].map(rid =>
+    const results = await Promise.all([...selectedIds].map(rid =>
       fetch(`/api/campaigns/${id}/recipients/${rid}`, { method: 'DELETE' })
     ));
+    if (!results.every(r => r.ok)) {
+      flash('Some deletions failed', 'error');
+      return;
+    }
     setSelectedIds(new Set());
     reload();
   }
