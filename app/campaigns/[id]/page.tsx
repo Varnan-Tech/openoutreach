@@ -167,6 +167,13 @@ export default function CampaignPage() {
     a.click(); URL.revokeObjectURL(url);
   }
 
+  async function deleteRecipient(recipientId: string) {
+    if (!confirm('Delete this recipient? This cannot be undone.')) return;
+    const res = await fetch(`/api/campaigns/${id}/recipients/${recipientId}`, { method: 'DELETE' });
+    if (res.ok) { setDetailRecipient(null); reload(); }
+    else flash('Failed to delete recipient', 'error');
+  }
+
   async function uploadCSV(file: File) {
     setUploading(true);
     const text = await file.text();
@@ -1132,17 +1139,29 @@ export default function CampaignPage() {
                   </div>
 
                   {/* Footer */}
-                  {detailRecipient.stage === 'new' && (
-                    <div style={{ padding: '14px 22px', borderTop: '1px solid var(--border)', flexShrink: 0 }}>
+                  <div style={{ padding: '14px 22px', borderTop: '1px solid var(--border)', flexShrink: 0, display: 'flex', gap: 8 }}>
+                    <button
+                      onClick={() => deleteRecipient(detailRecipient.id)}
+                      style={{
+                        background: 'rgba(251,113,133,0.08)', color: '#FB7185',
+                        border: '1px solid rgba(251,113,133,0.2)',
+                        borderRadius: 7, padding: '8px 14px',
+                        fontSize: 11, fontWeight: 700, cursor: 'pointer',
+                        fontFamily: 'var(--font-mono)', letterSpacing: '0.05em', textTransform: 'uppercase' as const,
+                      }}
+                    >
+                      Delete
+                    </button>
+                    {detailRecipient.stage === 'new' && (
                       <button
                         onClick={() => { sendNow(detailRecipient.id); setDetailRecipient(null); }}
                         disabled={sending === detailRecipient.id}
-                        style={{ width: '100%', background: 'rgba(99,102,241,0.12)', color: '#818CF8', border: '1px solid rgba(99,102,241,0.3)', borderRadius: 7, padding: '9px 0', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'var(--font-mono)', letterSpacing: '0.06em', textTransform: 'uppercase' }}
+                        style={{ flex: 1, background: 'rgba(99,102,241,0.12)', color: '#818CF8', border: '1px solid rgba(99,102,241,0.3)', borderRadius: 7, padding: '8px 0', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'var(--font-mono)', letterSpacing: '0.06em', textTransform: 'uppercase' as const }}
                       >
                         ▶ Send Now
                       </button>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </>
               );
             })()}
