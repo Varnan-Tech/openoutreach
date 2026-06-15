@@ -21,7 +21,7 @@ export async function POST(_: NextRequest, { params }: { params: Promise<{ id: s
   const sampleData = newRecipients[0].data as Record<string, unknown>;
   const csvHeaders = Object.keys(sampleData);
   const step0 = campaign.sequenceSteps[0];
-  const lintErrors = campaign.sequenceSteps.flatMap(step => [
+  const lintErrors = campaign.sequenceSteps.flatMap((step: { subjectTemplate: string; bodyTextTemplate: string }) => [
     ...lintTemplate(step.subjectTemplate, csvHeaders),
     ...lintTemplate(step.bodyTextTemplate, csvHeaders),
   ]);
