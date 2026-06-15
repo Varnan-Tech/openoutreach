@@ -31,6 +31,9 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   const valid = ['active', 'paused', 'completed'];
   if (!valid.includes(status)) return NextResponse.json({ error: 'Invalid status' }, { status: 400 });
   try {
+    const existing = await prisma.campaign.findUnique({ where: { id }, select: { status: true } });
+    if (!existing) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+    if (existing.status === 'completed') return NextResponse.json({ error: 'Cannot modify completed campaign' }, { status: 400 });
     const campaign = await prisma.campaign.update({ where: { id }, data: { status } });
     return NextResponse.json(campaign);
   } catch {
