@@ -50,6 +50,14 @@ export default function CampaignPage() {
   const [detailRecipient, setDetailRecipient] = useState<any>(null);
   const [detailLoading, setDetailLoading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  function toggleSelect(rid: string) {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      next.has(rid) ? next.delete(rid) : next.add(rid);
+      return next;
+    });
+  }
 
   const reload = useCallback(() => {
     fetch(`/api/campaigns/${id}`).then(r => r.ok ? r.json() : null).then(d => { if (d) setCampaign(d); });
@@ -172,6 +180,16 @@ export default function CampaignPage() {
     const res = await fetch(`/api/campaigns/${id}/recipients/${recipientId}`, { method: 'DELETE' });
     if (res.ok) { setDetailRecipient(null); reload(); }
     else flash('Failed to delete recipient', 'error');
+  }
+
+  async function deleteSelected() {
+    if (!selectedIds.size) return;
+    if (!confirm(`Delete ${selectedIds.size} recipient(s)? This cannot be undone.`)) return;
+    await Promise.all([...selectedIds].map(rid =>
+      fetch(`/api/campaigns/${id}/recipients/${rid}`, { method: 'DELETE' })
+    ));
+    setSelectedIds(new Set());
+    reload();
   }
 
   async function uploadCSV(file: File) {
@@ -449,6 +467,29 @@ export default function CampaignPage() {
                 </button>
               )}
             </div>
+            {selectedIds.size > 0 && (
+              <div style={{
+                marginBottom: 12, display: 'flex', alignItems: 'center', gap: 12,
+                background: 'rgba(99,102,241,0.08)', border: '1px solid rgba(99,102,241,0.2)',
+                borderRadius: 8, padding: '8px 14px',
+              }}>
+                <span style={{ fontSize: 11, fontWeight: 600, color: '#818CF8', fontFamily: 'var(--font-mono)' }}>
+                  {selectedIds.size} selected
+                </span>
+                <button
+                  onClick={deleteSelected}
+                  style={{ background: 'rgba(251,113,133,0.1)', color: '#FB7185', border: '1px solid rgba(251,113,133,0.2)', borderRadius: 5, padding: '3px 12px', fontSize: 10, fontWeight: 700, cursor: 'pointer', fontFamily: 'var(--font-mono)', textTransform: 'uppercase' as const, letterSpacing: '0.06em' }}
+                >
+                  Delete Selected
+                </button>
+                <button
+                  onClick={() => setSelectedIds(new Set())}
+                  style={{ background: 'none', border: 'none', color: 'var(--dim)', fontSize: 11, cursor: 'pointer', fontFamily: 'var(--font-mono)' }}
+                >
+                  ✕ Clear
+                </button>
+              </div>
+            )}
             <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 8, alignItems: 'flex-start' }}>
               {KANBAN_STAGES.map((stage, idx) => {
                 const stageRecipients = recipients.filter(r => r.stage === stage.id);
@@ -496,6 +537,21 @@ export default function CampaignPage() {
                           {stageRecipients.length}
                         </span>
                       )}
+                      {stage.id === 'new' && stageRecipients.length > 0 && (
+                        <button
+                          onClick={e => {
+                            e.stopPropagation();
+                            const newIds = stageRecipients.map(r => r.id);
+                            const allSelected = newIds.every(nid => selectedIds.has(nid));
+                            if (allSelected) setSelectedIds(prev => { const n = new Set(prev); newIds.forEach(nid => n.delete(nid)); return n; });
+                            else setSelectedIds(prev => new Set([...prev, ...newIds]));
+                          }}
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--dim)', fontSize: 9, fontFamily: 'var(--font-mono)', padding: '0 4px' }}
+                          title="Select all new"
+                        >
+                          ⊞
+                        </button>
+                      )}
                     </div>
 
                     {/* Cards */}
@@ -530,6 +586,7 @@ export default function CampaignPage() {
                               borderRadius: 8, padding: '10px 11px',
                               transition: 'border-color 0.12s, background 0.12s',
                               cursor: 'pointer',
+                              position: 'relative',
                             }}
                             onMouseOver={e => {
                               e.currentTarget.style.borderColor = `${stage.color}70`;
@@ -540,6 +597,22 @@ export default function CampaignPage() {
                               e.currentTarget.style.background = 'rgba(255,255,255,0.06)';
                             }}
                           >
+                            {r.stage === 'new' && (
+                              <div
+                                onClick={e => { e.stopPropagation(); toggleSelect(r.id); }}
+                                style={{
+                                  position: 'absolute', top: 8, right: 8,
+                                  width: 16, height: 16, borderRadius: 4,
+                                  border: `1px solid ${selectedIds.has(r.id) ? 'rgba(99,102,241,0.7)' : 'rgba(255,255,255,0.15)'}`,
+                                  background: selectedIds.has(r.id) ? 'rgba(99,102,241,0.3)' : 'transparent',
+                                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                  cursor: 'pointer', fontSize: 9, color: '#818CF8',
+                                  transition: 'all 0.12s',
+                                }}
+                              >
+                                {selectedIds.has(r.id) && '✓'}
+                              </div>
+                            )}
                             <div style={{
                               fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 400,
                               color: 'var(--text)', marginBottom: company ? 2 : 4, lineHeight: 1.3,
