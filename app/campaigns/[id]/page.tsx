@@ -128,7 +128,7 @@ export default function CampaignPage() {
     if (res.ok) {
       reload();
       setDetailRecipient((prev: any) => prev ? { ...prev, stage } : null);
-    }
+    } else { flash('Failed to change stage', 'error'); }
   }
 
   async function uploadCSV(file: File) {

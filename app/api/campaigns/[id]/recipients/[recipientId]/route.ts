@@ -26,7 +26,7 @@ export async function PATCH(
 ) {
   const { id, recipientId } = await params;
   const { stage } = await req.json();
-  const valid = ['new','in_sequence','opened','replied','bounced','unsubscribed','completed'];
+  const valid = ['new','in_sequence','opened','replied','bounced','unsubscribed','completed']; // 'queued' excluded — system-managed by cron/sequencer; manual stage changes skip it
   if (!valid.includes(stage)) return NextResponse.json({ error: 'Invalid stage' }, { status: 400 });
   try {
     const recipient = await prisma.recipient.update({
