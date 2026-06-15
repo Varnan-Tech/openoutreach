@@ -31,7 +31,7 @@ export async function POST(_: NextRequest, { params }: { params: Promise<{ id: s
   const now = new Date();
   await prisma.$transaction([
     prisma.scheduledSend.createMany({
-      data: newRecipients.map(r => ({
+      data: newRecipients.map((r: { id: string }) => ({
         recipientId: r.id, stepId: step0.id, scheduledAt: now, status: 'pending',
       })),
     }),
