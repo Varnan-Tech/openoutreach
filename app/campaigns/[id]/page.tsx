@@ -43,6 +43,7 @@ export default function CampaignPage() {
   const [draft, setDraft] = useState<StepDraft>({ subject: '', bodyText: '', delayDays: 0 });
   const [addingStep, setAddingStep] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const reload = useCallback(() => {
@@ -190,6 +191,22 @@ export default function CampaignPage() {
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <span style={{ fontSize: 11, color: 'var(--dim)', fontFamily: 'var(--font-mono)' }}>{campaign.fromEmail}</span>
+            <button
+              onClick={() => setShowSettings(s => !s)}
+              title="Campaign settings"
+              style={{
+                background: showSettings ? 'rgba(255,255,255,0.07)' : 'none',
+                border: `1px solid ${showSettings ? 'var(--border-2)' : 'var(--border)'}`,
+                borderRadius: 6, width: 30, height: 30,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                cursor: 'pointer', color: showSettings ? 'var(--text)' : 'var(--dim)',
+                fontSize: 14, transition: 'all 0.15s', flexShrink: 0,
+              }}
+              onMouseOver={e => { e.currentTarget.style.borderColor = 'var(--border-2)'; e.currentTarget.style.color = 'var(--text)'; }}
+              onMouseOut={e => { if (!showSettings) { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--dim)'; } }}
+            >
+              ⚙
+            </button>
             {campaign.status === 'draft' && (
               <button
                 onClick={launch} disabled={launching}
@@ -414,8 +431,8 @@ export default function CampaignPage() {
             </div>
           </div>
 
-          {/* ── Info tiles ─────────────────────────────────────────────── */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10 }}>
+          {/* ── Info tiles (collapsible via ⚙) ────────────────────────── */}
+          {showSettings && <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10 }}>
             {[
               { title: 'Send Window', value: `${campaign.sendWindowStart}:00 – ${campaign.sendWindowEnd}:00`, sub: campaign.sendWindowDays, accent: '#6366F1' },
               { title: 'Daily Cap',   value: String(campaign.dailyCap), sub: 'emails / day', accent: '#10B981' },
@@ -444,7 +461,7 @@ export default function CampaignPage() {
                 <div style={{ fontSize: 11, color: 'var(--muted)' }}>{sub}</div>
               </div>
             ))}
-          </div>
+          </div>}
 
           {/* ── Sequence Steps ─────────────────────────────────────────── */}
           <div style={{ background: 'var(--surface)', borderRadius: 12, border: '1px solid var(--border)' }}>
