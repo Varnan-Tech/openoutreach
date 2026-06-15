@@ -131,6 +131,17 @@ export default function CampaignPage() {
     } else { flash('Failed to change stage', 'error'); }
   }
 
+  async function togglePause() {
+    const newStatus = campaign.status === 'active' ? 'paused' : 'active';
+    const res = await fetch(`/api/campaigns/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: newStatus }),
+    });
+    if (res.ok) reload();
+    else flash('Failed to update campaign status', 'error');
+  }
+
   async function uploadCSV(file: File) {
     setUploading(true);
     const text = await file.text();
@@ -266,6 +277,22 @@ export default function CampaignPage() {
             >
               ⚙
             </button>
+            {(campaign.status === 'active' || campaign.status === 'paused') && (
+              <button
+                onClick={togglePause}
+                style={{
+                  background: campaign.status === 'paused' ? 'rgba(16,185,129,0.1)' : 'rgba(245,158,11,0.1)',
+                  color: campaign.status === 'paused' ? '#10B981' : '#F59E0B',
+                  border: `1px solid ${campaign.status === 'paused' ? 'rgba(16,185,129,0.25)' : 'rgba(245,158,11,0.25)'}`,
+                  padding: '6px 14px', borderRadius: 6,
+                  fontSize: 11, fontWeight: 700, letterSpacing: '0.06em',
+                  textTransform: 'uppercase' as const, fontFamily: 'var(--font-mono)',
+                  cursor: 'pointer', transition: 'all 0.15s',
+                }}
+              >
+                {campaign.status === 'paused' ? '▶ Resume' : '⏸ Pause'}
+              </button>
+            )}
             {campaign.status === 'draft' && (
               <button
                 onClick={launch} disabled={launching}

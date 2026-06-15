@@ -25,6 +25,19 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   }
 }
 
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const { status } = await req.json();
+  const valid = ['active', 'paused', 'completed'];
+  if (!valid.includes(status)) return NextResponse.json({ error: 'Invalid status' }, { status: 400 });
+  try {
+    const campaign = await prisma.campaign.update({ where: { id }, data: { status } });
+    return NextResponse.json(campaign);
+  } catch {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  }
+}
+
 export async function DELETE(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   try {
