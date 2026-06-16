@@ -55,6 +55,7 @@ export default function CampaignPage() {
   const [singleLead, setSingleLead] = useState<Record<string, string>>({ email: '' });
   const [addingLead, setAddingLead] = useState(false);
   const [newFieldName, setNewFieldName] = useState('');
+  const [runningDispatch, setRunningDispatch] = useState(false);
   const bodyRef = useRef<HTMLTextAreaElement>(null);
   const editBodyRef = useRef<HTMLTextAreaElement>(null);
   const [editDraft, setEditDraft] = useState<{ id: string; subject: string; bodyText: string; delayDays: number }>({ id: '', subject: '', bodyText: '', delayDays: 0 });
@@ -274,6 +275,21 @@ export default function CampaignPage() {
     setTimeout(() => { ta.focus(); ta.setSelectionRange(start + token.length, start + token.length); }, 0);
   }
 
+  async function runDispatcher() {
+    if (runningDispatch) return;
+    setRunningDispatch(true);
+    try {
+      const res = await fetch('/api/cron');
+      const data = await res.json();
+      if (res.ok) flash(data.message ?? `Dispatched ${data.sent ?? 0} email(s)`, 'ok');
+      else flash(data.error ?? 'Dispatcher failed', 'error');
+      reload();
+    } catch {
+      flash('Dispatcher failed', 'error');
+    }
+    setRunningDispatch(false);
+  }
+
   async function updateStep(e: React.FormEvent) {
     e.preventDefault();
     setSavingStep(true);
@@ -407,6 +423,24 @@ export default function CampaignPage() {
               onMouseOut={e => { if (!showAddLead) { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'; e.currentTarget.style.color = 'var(--muted)'; } }}
             >
               + Add Lead
+            </button>
+            <button
+              onClick={runDispatcher}
+              disabled={runningDispatch}
+              style={{
+                background: runningDispatch ? 'rgba(16,185,129,0.15)' : 'rgba(16,185,129,0.08)',
+                border: `1px solid ${runningDispatch ? 'rgba(16,185,129,0.4)' : 'rgba(16,185,129,0.2)'}`,
+                borderRadius: 6, height: 30, padding: '0 12px',
+                display: 'flex', alignItems: 'center',
+                cursor: runningDispatch ? 'not-allowed' : 'pointer',
+                color: runningDispatch ? '#6EE7B7' : '#10B981',
+                fontSize: 11, fontWeight: 600, fontFamily: 'var(--font-mono)',
+                transition: 'all 0.15s', flexShrink: 0,
+              }}
+              onMouseOver={e => { if (!runningDispatch) { e.currentTarget.style.background = 'rgba(16,185,129,0.15)'; e.currentTarget.style.borderColor = 'rgba(16,185,129,0.4)'; } }}
+              onMouseOut={e => { if (!runningDispatch) { e.currentTarget.style.background = 'rgba(16,185,129,0.08)'; e.currentTarget.style.borderColor = 'rgba(16,185,129,0.2)'; } }}
+            >
+              {runningDispatch ? 'Dispatching···' : '▶ Run Dispatcher'}
             </button>
             <button
               onClick={() => setShowSettings(s => !s)}
