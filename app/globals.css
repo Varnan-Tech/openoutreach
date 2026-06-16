@@ -11,18 +11,18 @@
   --muted:       rgba(232,234,240,0.5);
   --dim:         rgba(232,234,240,0.22);
 
-  /* Accent palette */
-  --indigo:      #6366F1;
-  --indigo-pale: rgba(99,102,241,0.12);
-  --amber:       #F59E0B;
+  /* Primary action accent — warm orange, replaces AI-purple indigo */
+  --accent:      #F97316;
+  --accent-pale: rgba(249,115,22,0.10);
+
+  /* Semantic status colors — do not use for UI chrome */
+  --amber:       #F59E0B;  /* opened */
   --amber-pale:  rgba(245,158,11,0.1);
-  --emerald:     #10B981;
+  --emerald:     #10B981;  /* replied */
   --emerald-pale:rgba(16,185,129,0.1);
-  --coral:       #FB7185;
+  --coral:       #FB7185;  /* bounced */
   --coral-pale:  rgba(251,113,133,0.1);
-  --sky:         #38BDF8;
-  --violet:      #8B5CF6;
-  --slate:       #475569;
+  --violet:      #8B5CF6;  /* completed — semantic only */
 
   /* Font families — loaded by layout.tsx */
   --font-display: var(--font-fraunces, Georgia, serif);
@@ -51,4 +51,17 @@ html, body {
 ::-webkit-scrollbar-thumb {
   background: rgba(255,255,255,0.1);
   border-radius: 3px;
+}
+
+/* Skeleton loader shimmer */
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+  border-radius: 6px;
 }
