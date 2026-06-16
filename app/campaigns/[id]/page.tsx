@@ -418,7 +418,7 @@ export default function CampaignPage() {
               Email Template & Follow-up
               {steps.length > 0 && (
                 <span style={{
-                  background: '#6366F1', color: '#fff',
+                  background: 'var(--accent)', color: '#fff',
                   fontSize: 9, fontWeight: 700, fontFamily: 'var(--font-mono)',
                   padding: '1px 5px', borderRadius: 8,
                 }}>
@@ -445,15 +445,15 @@ export default function CampaignPage() {
             <button
               onClick={() => setShowAddLead(s => !s)}
               style={{
-                background: showAddLead ? 'rgba(99,102,241,0.15)' : 'rgba(255,255,255,0.04)',
-                border: `1px solid ${showAddLead ? 'rgba(99,102,241,0.4)' : 'rgba(255,255,255,0.12)'}`,
+                background: showAddLead ? 'rgba(249,115,22,0.12)' : 'rgba(255,255,255,0.04)',
+                border: `1px solid ${showAddLead ? 'rgba(249,115,22,0.35)' : 'rgba(255,255,255,0.12)'}`,
                 borderRadius: 6, height: 30, padding: '0 12px',
                 display: 'flex', alignItems: 'center',
-                cursor: 'pointer', color: showAddLead ? '#818CF8' : 'var(--muted)',
+                cursor: 'pointer', color: showAddLead ? 'var(--accent)' : 'var(--muted)',
                 fontSize: 11, fontWeight: 600, fontFamily: 'var(--font-mono)',
                 transition: 'all 0.15s', flexShrink: 0,
               }}
-              onMouseOver={e => { e.currentTarget.style.borderColor = 'rgba(99,102,241,0.4)'; e.currentTarget.style.color = '#818CF8'; }}
+              onMouseOver={e => { e.currentTarget.style.borderColor = 'rgba(249,115,22,0.35)'; e.currentTarget.style.color = 'var(--accent)'; }}
               onMouseOut={e => { if (!showAddLead) { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'; e.currentTarget.style.color = 'var(--muted)'; } }}
             >
               + Add Lead
@@ -535,7 +535,6 @@ export default function CampaignPage() {
                   textTransform: 'uppercase', fontFamily: 'var(--font-mono)',
                   cursor: launching ? 'not-allowed' : 'pointer',
                   transition: 'all 0.15s',
-                  boxShadow: launching ? 'none' : '0 0 12px rgba(16,185,129,0.15)',
                 }}
               >
                 {launching ? '···' : '▶ Launch'}
@@ -565,10 +564,10 @@ export default function CampaignPage() {
           <div style={{ width: 1, background: 'var(--border-2)', flexShrink: 0, margin: '2px 4px' }} />
 
           {/* Sequence group */}
-          <div style={{ display: 'flex', gap: 1, background: 'rgba(99,102,241,0.08)', borderRadius: 9, padding: 3, border: '1px solid rgba(99,102,241,0.22)', flexShrink: 0 }}>
+          <div style={{ display: 'flex', gap: 1, background: 'rgba(249,115,22,0.08)', borderRadius: 9, padding: 3, border: '1px solid rgba(249,115,22,0.22)', flexShrink: 0 }}>
             <div style={{ padding: '7px 16px', borderRadius: 7, display: 'flex', flexDirection: 'column', gap: 5 }}>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 300, color: '#818CF8', letterSpacing: '-0.03em', lineHeight: 1, textShadow: '0 0 16px #6366F155' }}>{String(counts.in_sequence || 0)}</div>
-              <div style={{ fontSize: 9, color: '#A5B4FC', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'var(--font-mono)' }}>In Seq</div>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 300, color: 'var(--accent)', letterSpacing: '-0.03em', lineHeight: 1 }}>{String(counts.in_sequence || 0)}</div>
+              <div style={{ fontSize: 9, color: 'rgba(249,115,22,0.7)', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'var(--font-mono)' }}>In Seq</div>
             </div>
           </div>
 
@@ -579,7 +578,7 @@ export default function CampaignPage() {
               { label: 'Open %', value: openRate === '—' ? '—' : `${openRate}%` },
             ].map(({ label, value }, i, arr) => (
               <div key={label} style={{ padding: '7px 16px', borderRadius: 7, display: 'flex', flexDirection: 'column', gap: 5, borderRight: i < arr.length - 1 ? '1px solid rgba(245,158,11,0.15)' : 'none' }}>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 300, color: '#FBB740', letterSpacing: '-0.03em', lineHeight: 1, textShadow: '0 0 16px #F59E0B55' }}>{value}</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 300, color: '#FBB740', letterSpacing: '-0.03em', lineHeight: 1 }}>{value}</div>
                 <div style={{ fontSize: 9, color: '#FCD34D', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'var(--font-mono)' }}>{label}</div>
               </div>
             ))}
@@ -592,7 +591,7 @@ export default function CampaignPage() {
               { label: 'Reply %', value: replyRate === '—' ? '—' : `${replyRate}%` },
             ].map(({ label, value }, i, arr) => (
               <div key={label} style={{ padding: '7px 16px', borderRadius: 7, display: 'flex', flexDirection: 'column', gap: 5, borderRight: i < arr.length - 1 ? '1px solid rgba(16,185,129,0.15)' : 'none' }}>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 300, color: '#34D399', letterSpacing: '-0.03em', lineHeight: 1, textShadow: '0 0 16px #10B98155' }}>{value}</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 300, color: '#34D399', letterSpacing: '-0.03em', lineHeight: 1 }}>{value}</div>
                 <div style={{ fontSize: 9, color: '#6EE7B7', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'var(--font-mono)' }}>{label}</div>
               </div>
             ))}
@@ -601,7 +600,7 @@ export default function CampaignPage() {
           {/* Bounced */}
           <div style={{ display: 'flex', background: 'rgba(251,113,133,0.08)', borderRadius: 9, padding: 3, border: '1px solid rgba(251,113,133,0.22)', flexShrink: 0 }}>
             <div style={{ padding: '7px 16px', borderRadius: 7, display: 'flex', flexDirection: 'column', gap: 5 }}>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 300, color: '#FB7185', letterSpacing: '-0.03em', lineHeight: 1, textShadow: '0 0 16px #FB718555' }}>{String(counts.bounced || 0)}</div>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 300, color: '#FB7185', letterSpacing: '-0.03em', lineHeight: 1 }}>{String(counts.bounced || 0)}</div>
               <div style={{ fontSize: 9, color: '#FCA5A5', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'var(--font-mono)' }}>Bounced</div>
             </div>
           </div>
@@ -640,7 +639,7 @@ export default function CampaignPage() {
                     cursor: 'pointer', fontFamily: 'var(--font-mono)', letterSpacing: '0.06em',
                     textTransform: 'uppercase' as const, transition: 'all 0.12s',
                   }}
-                  onMouseOver={e => { e.currentTarget.style.borderColor = 'rgba(99,102,241,0.4)'; e.currentTarget.style.color = '#818CF8'; }}
+                  onMouseOver={e => { e.currentTarget.style.borderColor = 'rgba(249,115,22,0.4)'; e.currentTarget.style.color = 'var(--accent)'; }}
                   onMouseOut={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = 'var(--muted)'; }}
                 >
                   ↓ Export CSV
@@ -650,10 +649,10 @@ export default function CampaignPage() {
             {selectedIds.size > 0 && (
               <div style={{
                 marginBottom: 12, display: 'flex', alignItems: 'center', gap: 12,
-                background: 'rgba(99,102,241,0.08)', border: '1px solid rgba(99,102,241,0.2)',
+                background: 'rgba(249,115,22,0.08)', border: '1px solid rgba(249,115,22,0.2)',
                 borderRadius: 8, padding: '8px 14px',
               }}>
-                <span style={{ fontSize: 11, fontWeight: 600, color: '#818CF8', fontFamily: 'var(--font-mono)' }}>
+                <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--accent)', fontFamily: 'var(--font-mono)' }}>
                   {selectedIds.size} selected
                 </span>
                 <button
