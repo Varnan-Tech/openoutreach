@@ -267,7 +267,7 @@ export default function CampaignPage() {
   const openRate  = totalSent > 0 ? (((counts.opened || 0) + (counts.replied || 0)) / totalSent * 100).toFixed(1) : '—';
   const replyRate = totalSent > 0 ? ((counts.replied || 0) / totalSent * 100).toFixed(1) : '—';
 
-  // Dynamic Kanban columns: New → one column per step → Replied / Bounced / Unsub / Done
+  // Dynamic Kanban columns: New → one column per step (completed show here too) → Replied / Bounced / Unsub
   const cumulativeDays = steps.reduce<number[]>((acc, step, i) => {
     acc.push((acc[i - 1] ?? 0) + (step.delayDaysFromPrevious ?? 0));
     return acc;
@@ -278,12 +278,11 @@ export default function CampaignPage() {
       id: `step_${step.stepNumber}`,
       label: `Day ${cumulativeDays[i]} Sent`,
       color: '#6366F1',
-      filter: (r: any) => (r.stage === 'in_sequence' || r.stage === 'opened') && r.currentStep === step.stepNumber,
+      filter: (r: any) => (r.stage === 'in_sequence' || r.stage === 'opened' || r.stage === 'completed') && r.currentStep === step.stepNumber,
     })),
     { id: 'replied',      label: 'Replied',   color: '#10B981', filter: (r: any) => r.stage === 'replied' },
     { id: 'bounced',      label: 'Bounced',   color: '#FB7185', filter: (r: any) => r.stage === 'bounced' },
     { id: 'unsubscribed', label: 'Unsub',     color: '#475569', filter: (r: any) => r.stage === 'unsubscribed' },
-    { id: 'completed',    label: 'Done',      color: '#8B5CF6', filter: (r: any) => r.stage === 'completed' },
   ];
   const sc = STATUS_CFG[campaign?.status] ?? STATUS_CFG.draft;
   const dataKeys = Array.from(new Set(recipients.flatMap(r => Object.keys((r.data as Record<string, string>) ?? {}))));
@@ -770,8 +769,8 @@ export default function CampaignPage() {
                               position: 'relative',
                             }}
                             onMouseOver={e => {
-                              e.currentTarget.style.borderColor = `${stage.color}70`;
-                              e.currentTarget.style.background = `${stage.color}12`;
+                              e.currentTarget.style.borderColor = `${col.color}70`;
+                              e.currentTarget.style.background = `${col.color}12`;
                             }}
                             onMouseOut={e => {
                               e.currentTarget.style.borderColor = 'rgba(255,255,255,0.11)';
@@ -824,6 +823,11 @@ export default function CampaignPage() {
                                 <span style={{ fontSize: 9, fontFamily: 'var(--font-mono)', fontWeight: 700, color: '#F59E0B', letterSpacing: '0.05em' }}>
                                   {r._opens}× opened
                                 </span>
+                              </div>
+                            )}
+                            {r.stage === 'completed' && (
+                              <div style={{ marginTop: 6, display: 'inline-flex', alignItems: 'center', gap: 4, background: 'rgba(139,92,246,0.1)', border: '1px solid rgba(139,92,246,0.25)', borderRadius: 4, padding: '2px 7px' }}>
+                                <span style={{ fontSize: 9, fontFamily: 'var(--font-mono)', fontWeight: 700, color: '#8B5CF6', letterSpacing: '0.05em' }}>✓ Done</span>
                               </div>
                             )}
                             {r.stage === 'new' && (
