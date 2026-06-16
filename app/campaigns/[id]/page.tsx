@@ -56,6 +56,8 @@ export default function CampaignPage() {
   const [addingLead, setAddingLead] = useState(false);
   const [newFieldName, setNewFieldName] = useState('');
   const [runningDispatch, setRunningDispatch] = useState(false);
+  const [settingsDraft, setSettingsDraft] = useState<{ name: string; fromEmail: string; fromName: string; unosendApiKey: string; sendWindowStart: number; sendWindowEnd: number; sendWindowDays: string; tz: string; dailyCap: number } | null>(null);
+  const [savingSettings, setSavingSettings] = useState(false);
   const bodyRef = useRef<HTMLTextAreaElement>(null);
   const editBodyRef = useRef<HTMLTextAreaElement>(null);
   const [editDraft, setEditDraft] = useState<{ id: string; subject: string; bodyText: string; delayDays: number }>({ id: '', subject: '', bodyText: '', delayDays: 0 });
@@ -147,6 +149,20 @@ export default function CampaignPage() {
       reload();
       setDetailRecipient((prev: any) => prev ? { ...prev, stage } : null);
     } else { flash('Failed to change stage', 'error'); }
+  }
+
+  async function saveSettings(e: React.FormEvent) {
+    e.preventDefault();
+    if (!settingsDraft) return;
+    setSavingSettings(true);
+    const res = await fetch(`/api/campaigns/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...settingsDraft, fromDomain: settingsDraft.fromEmail.split('@')[1] ?? '' }),
+    });
+    if (res.ok) { flash('Settings saved', 'ok'); reload(); setShowSettings(false); }
+    else flash('Failed to save settings', 'error');
+    setSavingSettings(false);
   }
 
   async function togglePause() {
@@ -443,7 +459,22 @@ export default function CampaignPage() {
               {runningDispatch ? 'Dispatching···' : '▶ Run Dispatcher'}
             </button>
             <button
-              onClick={() => setShowSettings(s => !s)}
+              onClick={() => {
+                if (!showSettings && campaign) {
+                  setSettingsDraft({
+                    name: campaign.name,
+                    fromEmail: campaign.fromEmail,
+                    fromName: campaign.fromName,
+                    unosendApiKey: campaign.unosendApiKey ?? '',
+                    sendWindowStart: campaign.sendWindowStart,
+                    sendWindowEnd: campaign.sendWindowEnd,
+                    sendWindowDays: campaign.sendWindowDays,
+                    tz: campaign.tz,
+                    dailyCap: campaign.dailyCap,
+                  });
+                }
+                setShowSettings(s => !s);
+              }}
               style={{
                 background: showSettings ? 'rgba(255,255,255,0.09)' : 'rgba(255,255,255,0.04)',
                 border: `1px solid ${showSettings ? 'var(--border-2)' : 'rgba(255,255,255,0.12)'}`,
@@ -1525,7 +1556,7 @@ export default function CampaignPage() {
       )}
 
       {/* ── Settings dialog ──────────────────────────────────────────────── */}
-      {showSettings && (
+      {showSettings && settingsDraft && (
         <div
           onClick={() => setShowSettings(false)}
           style={{
@@ -1542,8 +1573,10 @@ export default function CampaignPage() {
               border: '1px solid var(--border-2)',
               borderRadius: 16,
               padding: '24px 26px',
-              width: 480,
+              width: 520,
               maxWidth: 'calc(100vw - 40px)',
+              maxHeight: 'calc(100vh - 60px)',
+              overflowY: 'auto',
               boxShadow: '0 24px 60px rgba(0,0,0,0.5)',
             }}
           >
@@ -1576,34 +1609,124 @@ export default function CampaignPage() {
               </button>
             </div>
 
-            {/* Settings rows */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              {[
-                { title: 'Send Window', value: `${campaign.sendWindowStart}:00 – ${campaign.sendWindowEnd}:00`, sub: campaign.sendWindowDays, accent: '#6366F1' },
-                { title: 'Daily Cap',   value: `${campaign.dailyCap} emails / day`, sub: undefined, accent: '#10B981' },
-                { title: 'Timezone',    value: campaign.tz, sub: undefined, accent: '#F59E0B' },
-                { title: 'Steps',       value: `${steps.length} step${steps.length !== 1 ? 's' : ''}`, sub: undefined, accent: '#8B5CF6' },
-                { title: 'From',        value: campaign.fromEmail, sub: undefined, accent: '#38BDF8' },
-              ].map(({ title, value, sub, accent }) => (
-                <div key={title} style={{
-                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                  padding: '12px 14px',
-                  background: 'rgba(255,255,255,0.025)',
-                  borderRadius: 8,
-                  borderLeft: `2px solid ${accent}`,
-                }}>
-                  <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--dim)', textTransform: 'uppercase', letterSpacing: '0.09em', fontFamily: 'var(--font-mono)' }}>
-                    {title}
+            {/* Editable settings form */}
+            <form onSubmit={saveSettings}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+
+                {/* Identity */}
+                <div style={{ fontSize: 9, fontWeight: 700, color: 'var(--dim)', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'var(--font-mono)' }}>
+                  Identity
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                  <div>
+                    <label style={{ fontSize: 10, fontWeight: 600, color: 'var(--dim)', display: 'block', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.07em' }}>Campaign Name</label>
+                    <input type="text" required value={settingsDraft.name}
+                      onChange={e => setSettingsDraft(d => d ? { ...d, name: e.target.value } : d)}
+                      style={iStyle}
+                      onFocus={e => (e.target.style.borderColor = 'rgba(99,102,241,0.5)')}
+                      onBlur={e => (e.target.style.borderColor = 'var(--border-2)')} />
                   </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: 13, fontWeight: 400, color: 'var(--text)' }}>
-                      {value}
-                    </div>
-                    {sub && <div style={{ fontSize: 10, color: 'var(--muted)', marginTop: 2 }}>{sub}</div>}
+                  <div>
+                    <label style={{ fontSize: 10, fontWeight: 600, color: 'var(--dim)', display: 'block', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.07em' }}>From Name</label>
+                    <input type="text" required value={settingsDraft.fromName}
+                      onChange={e => setSettingsDraft(d => d ? { ...d, fromName: e.target.value } : d)}
+                      style={iStyle}
+                      onFocus={e => (e.target.style.borderColor = 'rgba(99,102,241,0.5)')}
+                      onBlur={e => (e.target.style.borderColor = 'var(--border-2)')} />
                   </div>
                 </div>
-              ))}
-            </div>
+                <div>
+                  <label style={{ fontSize: 10, fontWeight: 600, color: 'var(--dim)', display: 'block', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.07em' }}>From Email</label>
+                  <input type="email" required value={settingsDraft.fromEmail}
+                    onChange={e => setSettingsDraft(d => d ? { ...d, fromEmail: e.target.value } : d)}
+                    style={iStyle}
+                    onFocus={e => (e.target.style.borderColor = 'rgba(99,102,241,0.5)')}
+                    onBlur={e => (e.target.style.borderColor = 'var(--border-2)')} />
+                </div>
+                <div>
+                  <label style={{ fontSize: 10, fontWeight: 600, color: 'var(--dim)', display: 'block', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.07em' }}>Autosend API Key</label>
+                  <input type="text" value={settingsDraft.unosendApiKey}
+                    onChange={e => setSettingsDraft(d => d ? { ...d, unosendApiKey: e.target.value } : d)}
+                    style={iStyle} placeholder="AS_..."
+                    onFocus={e => (e.target.style.borderColor = 'rgba(99,102,241,0.5)')}
+                    onBlur={e => (e.target.style.borderColor = 'var(--border-2)')} />
+                </div>
+
+                {/* Send Window */}
+                <div style={{ borderTop: '1px solid var(--border)', paddingTop: 14 }}>
+                  <div style={{ fontSize: 9, fontWeight: 700, color: 'var(--dim)', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'var(--font-mono)', marginBottom: 12 }}>
+                    Send Window
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
+                    <div>
+                      <label style={{ fontSize: 10, fontWeight: 600, color: 'var(--dim)', display: 'block', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.07em' }}>Start Hour (0–23)</label>
+                      <input type="number" min={0} max={23} required value={settingsDraft.sendWindowStart}
+                        onChange={e => setSettingsDraft(d => d ? { ...d, sendWindowStart: Number(e.target.value) } : d)}
+                        style={iStyle}
+                        onFocus={e => (e.target.style.borderColor = 'rgba(99,102,241,0.5)')}
+                        onBlur={e => (e.target.style.borderColor = 'var(--border-2)')} />
+                      <div style={{ fontSize: 10, color: 'var(--dim)', marginTop: 3 }}>19 = 7 PM</div>
+                    </div>
+                    <div>
+                      <label style={{ fontSize: 10, fontWeight: 600, color: 'var(--dim)', display: 'block', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.07em' }}>End Hour (0–23)</label>
+                      <input type="number" min={0} max={23} required value={settingsDraft.sendWindowEnd}
+                        onChange={e => setSettingsDraft(d => d ? { ...d, sendWindowEnd: Number(e.target.value) } : d)}
+                        style={iStyle}
+                        onFocus={e => (e.target.style.borderColor = 'rgba(99,102,241,0.5)')}
+                        onBlur={e => (e.target.style.borderColor = 'var(--border-2)')} />
+                      <div style={{ fontSize: 10, color: 'var(--dim)', marginTop: 3 }}>23 = 11 PM</div>
+                    </div>
+                  </div>
+                  <div style={{ marginBottom: 10 }}>
+                    <label style={{ fontSize: 10, fontWeight: 600, color: 'var(--dim)', display: 'block', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.07em' }}>Active Days</label>
+                    <input type="text" required value={settingsDraft.sendWindowDays}
+                      onChange={e => setSettingsDraft(d => d ? { ...d, sendWindowDays: e.target.value } : d)}
+                      style={iStyle} placeholder="Mon,Tue,Wed,Thu,Fri,Sat"
+                      onFocus={e => (e.target.style.borderColor = 'rgba(99,102,241,0.5)')}
+                      onBlur={e => (e.target.style.borderColor = 'var(--border-2)')} />
+                    <div style={{ fontSize: 10, color: 'var(--dim)', marginTop: 3 }}>Comma-separated: Mon,Tue,Wed,Thu,Fri,Sat,Sun</div>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                    <div>
+                      <label style={{ fontSize: 10, fontWeight: 600, color: 'var(--dim)', display: 'block', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.07em' }}>Timezone</label>
+                      <input type="text" required value={settingsDraft.tz}
+                        onChange={e => setSettingsDraft(d => d ? { ...d, tz: e.target.value } : d)}
+                        style={iStyle} placeholder="Asia/Kolkata"
+                        onFocus={e => (e.target.style.borderColor = 'rgba(99,102,241,0.5)')}
+                        onBlur={e => (e.target.style.borderColor = 'var(--border-2)')} />
+                    </div>
+                    <div>
+                      <label style={{ fontSize: 10, fontWeight: 600, color: 'var(--dim)', display: 'block', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.07em' }}>Daily Cap</label>
+                      <input type="number" min={1} required value={settingsDraft.dailyCap}
+                        onChange={e => setSettingsDraft(d => d ? { ...d, dailyCap: Number(e.target.value) } : d)}
+                        style={iStyle}
+                        onFocus={e => (e.target.style.borderColor = 'rgba(99,102,241,0.5)')}
+                        onBlur={e => (e.target.style.borderColor = 'var(--border-2)')} />
+                      <div style={{ fontSize: 10, color: 'var(--dim)', marginTop: 3 }}>Max emails to send per day</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Save */}
+                <div style={{ display: 'flex', gap: 10, marginTop: 4 }}>
+                  <button type="submit" disabled={savingSettings} style={{
+                    flex: 1, background: savingSettings ? 'rgba(99,102,241,0.4)' : 'var(--indigo)',
+                    color: '#fff', border: 'none', borderRadius: 8,
+                    padding: '10px 0', fontSize: 13, fontWeight: 600,
+                    cursor: savingSettings ? 'not-allowed' : 'pointer', fontFamily: 'inherit',
+                  }}>
+                    {savingSettings ? 'Saving…' : 'Save Settings'}
+                  </button>
+                  <button type="button" onClick={() => setShowSettings(false)} style={{
+                    background: 'none', border: '1px solid var(--border)', borderRadius: 8,
+                    padding: '10px 16px', fontSize: 13, fontWeight: 500,
+                    color: 'var(--muted)', cursor: 'pointer', fontFamily: 'inherit',
+                  }}>
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </form>
           </div>
         </div>
       )}
