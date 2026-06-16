@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
   }
 
   if (event.includes('open')) {
-    const protectedStages = ['replied', 'bounced', 'unsubscribed', 'completed'];
+    const protectedStages = ['replied', 'bounced', 'unsubscribed'];
     const shouldAdvanceStage = !protectedStages.includes(send.recipient.stage);
     if (shouldAdvanceStage) {
       await prisma.$transaction([
