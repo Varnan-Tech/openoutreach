@@ -266,6 +266,25 @@ export default function CampaignPage() {
   const totalSent = (counts.in_sequence || 0) + (counts.opened || 0) + (counts.replied || 0) + (counts.bounced || 0) + (counts.completed || 0);
   const openRate  = totalSent > 0 ? (((counts.opened || 0) + (counts.replied || 0)) / totalSent * 100).toFixed(1) : '—';
   const replyRate = totalSent > 0 ? ((counts.replied || 0) / totalSent * 100).toFixed(1) : '—';
+
+  // Dynamic Kanban columns: New → one column per step → Replied / Bounced / Unsub / Done
+  const cumulativeDays = steps.reduce<number[]>((acc, step, i) => {
+    acc.push((acc[i - 1] ?? 0) + (step.delayDaysFromPrevious ?? 0));
+    return acc;
+  }, []);
+  const kanbanCols = [
+    { id: 'new',          label: 'New Leads', color: '#64748B', filter: (r: any) => r.stage === 'new' },
+    ...steps.map((step: any, i: number) => ({
+      id: `step_${step.stepNumber}`,
+      label: `Day ${cumulativeDays[i]} Sent`,
+      color: '#6366F1',
+      filter: (r: any) => (r.stage === 'in_sequence' || r.stage === 'opened') && r.currentStep === step.stepNumber,
+    })),
+    { id: 'replied',      label: 'Replied',   color: '#10B981', filter: (r: any) => r.stage === 'replied' },
+    { id: 'bounced',      label: 'Bounced',   color: '#FB7185', filter: (r: any) => r.stage === 'bounced' },
+    { id: 'unsubscribed', label: 'Unsub',     color: '#475569', filter: (r: any) => r.stage === 'unsubscribed' },
+    { id: 'completed',    label: 'Done',      color: '#8B5CF6', filter: (r: any) => r.stage === 'completed' },
+  ];
   const sc = STATUS_CFG[campaign?.status] ?? STATUS_CFG.draft;
   const dataKeys = Array.from(new Set(recipients.flatMap(r => Object.keys((r.data as Record<string, string>) ?? {}))));
   // insert {{var}} at textarea cursor
@@ -653,19 +672,19 @@ export default function CampaignPage() {
               </div>
             )}
             <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 8, alignItems: 'flex-start' }}>
-              {KANBAN_STAGES.map((stage, idx) => {
-                const stageRecipients = recipients.filter(r => r.stage === stage.id);
+              {kanbanCols.map((col, idx) => {
+                const stageRecipients = recipients.filter(col.filter);
                 const isEmpty = stageRecipients.length === 0;
                 return (
                   <div
-                    key={stage.id}
+                    key={col.id}
                     className="oo-kanban-col"
                     style={{
                       minWidth: 210, maxWidth: 210, flexShrink: 0,
                       background: isEmpty ? 'rgba(255,255,255,0.02)' : 'var(--surface)',
                       border: `1px solid ${isEmpty ? 'rgba(255,255,255,0.09)' : 'var(--border)'}`,
                       borderRadius: 10, overflow: 'hidden',
-                      borderTop: `2px solid ${isEmpty ? stage.color + '55' : stage.color}`,
+                      borderTop: `2px solid ${isEmpty ? col.color + '55' : col.color}`,
                       animationDelay: `${idx * 45}ms`,
                       transition: 'border-color 0.2s, background 0.2s',
                     }}
@@ -674,12 +693,12 @@ export default function CampaignPage() {
                     <div style={{
                       padding: '9px 11px',
                       display: 'flex', alignItems: 'center', gap: 7,
-                      background: `linear-gradient(180deg, ${stage.color}${isEmpty ? '06' : '0D'} 0%, transparent 100%)`,
+                      background: `linear-gradient(180deg, ${col.color}${isEmpty ? '06' : '0D'} 0%, transparent 100%)`,
                     }}>
                       <span style={{
                         width: 5, height: 5, borderRadius: '50%',
-                        background: isEmpty ? stage.color + '70' : stage.color, flexShrink: 0,
-                        boxShadow: isEmpty ? `0 0 4px ${stage.color}40` : `0 0 6px ${stage.color}90`,
+                        background: isEmpty ? col.color + '70' : col.color, flexShrink: 0,
+                        boxShadow: isEmpty ? `0 0 4px ${col.color}40` : `0 0 6px ${col.color}90`,
                       }} />
                       <span style={{
                         fontSize: 9, fontWeight: 700,
@@ -687,19 +706,19 @@ export default function CampaignPage() {
                         textTransform: 'uppercase', letterSpacing: '0.1em',
                         flex: 1, fontFamily: 'var(--font-mono)',
                       }}>
-                        {stage.label}
+                        {col.label}
                       </span>
                       {!isEmpty && (
                         <span style={{
                           fontFamily: 'var(--font-mono)', fontSize: 10,
-                          color: stage.color,
-                          background: `${stage.color}22`,
+                          color: col.color,
+                          background: `${col.color}22`,
                           padding: '1px 6px', borderRadius: 4, fontWeight: 700,
                         }}>
                           {stageRecipients.length}
                         </span>
                       )}
-                      {stage.id === 'new' && stageRecipients.length > 0 && (
+                      {col.id === 'new' && stageRecipients.length > 0 && (
                         <button
                           onClick={e => {
                             e.stopPropagation();
@@ -791,7 +810,15 @@ export default function CampaignPage() {
                             }}>
                               {r.email}
                             </div>
-                            {r._opens > 0 && (
+                            {r.stage === 'opened' && (
+                              <div style={{ marginTop: 6, display: 'inline-flex', alignItems: 'center', gap: 4, background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.25)', borderRadius: 4, padding: '2px 7px' }}>
+                                <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#10B981', display: 'inline-block' }} />
+                                <span style={{ fontSize: 9, fontFamily: 'var(--font-mono)', fontWeight: 700, color: '#10B981', letterSpacing: '0.05em' }}>
+                                  Opened{r._opens > 1 ? ` ×${r._opens}` : ''}
+                                </span>
+                              </div>
+                            )}
+                            {r._opens > 0 && r.stage !== 'opened' && (
                               <div style={{ marginTop: 6, display: 'inline-flex', alignItems: 'center', gap: 4, background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: 4, padding: '2px 7px' }}>
                                 <span style={{ fontSize: 9 }}>👁</span>
                                 <span style={{ fontSize: 9, fontFamily: 'var(--font-mono)', fontWeight: 700, color: '#F59E0B', letterSpacing: '0.05em' }}>
