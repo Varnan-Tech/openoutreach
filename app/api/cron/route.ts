@@ -89,29 +89,39 @@ export async function GET() {
     data: { status: 'sent', unosendMsgId: result.messageId, sentAt: new Date() },
   });
 
-  // queue next step if exists
-  const nextStep = await prisma.sequenceStep.findUnique({
-    where: { campaignId_stepNumber: { campaignId: campaign.id, stepNumber: send.step.stepNumber + 1 } },
+  // Re-fetch stage — may have changed to replied/bounced while this send was in-flight
+  const freshRecipient = await prisma.recipient.findUnique({
+    where: { id: send.recipientId },
+    select: { stage: true },
   });
-  if (nextStep) {
-    const delayMs = nextStep.delayDaysFromPrevious * 86400 * 1000;
-    await prisma.scheduledSend.create({
-      data: {
-        recipientId: send.recipientId,
-        stepId: nextStep.id,
-        scheduledAt: new Date(Date.now() + delayMs),
-        status: 'pending',
-      },
+  const protectedStages = ['replied', 'bounced', 'unsubscribed'];
+  const isProtected = protectedStages.includes(freshRecipient?.stage ?? '');
+
+  if (!isProtected) {
+    // queue next step if exists
+    const nextStep = await prisma.sequenceStep.findUnique({
+      where: { campaignId_stepNumber: { campaignId: campaign.id, stepNumber: send.step.stepNumber + 1 } },
     });
-    await prisma.recipient.update({
-      where: { id: send.recipientId },
-      data: { stage: 'in_sequence', currentStep: send.step.stepNumber + 1 },
-    });
-  } else {
-    await prisma.recipient.update({
-      where: { id: send.recipientId },
-      data: { stage: 'completed', currentStep: send.step.stepNumber },
-    });
+    if (nextStep) {
+      const delayMs = nextStep.delayDaysFromPrevious * 86400 * 1000;
+      await prisma.scheduledSend.create({
+        data: {
+          recipientId: send.recipientId,
+          stepId: nextStep.id,
+          scheduledAt: new Date(Date.now() + delayMs),
+          status: 'pending',
+        },
+      });
+      await prisma.recipient.update({
+        where: { id: send.recipientId },
+        data: { stage: 'in_sequence', currentStep: send.step.stepNumber + 1 },
+      });
+    } else {
+      await prisma.recipient.update({
+        where: { id: send.recipientId },
+        data: { stage: 'completed', currentStep: send.step.stepNumber },
+      });
+    }
   }
 
   return NextResponse.json({ message: 'Sent', to: send.recipient.email, step: send.step.stepNumber });
