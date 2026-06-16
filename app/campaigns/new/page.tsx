@@ -36,8 +36,8 @@ function TF({ label, value, onChange, placeholder, required }: {
         onChange={e => onChange(e.target.value)}
         style={iStyle}
         onFocus={e => {
-          e.target.style.borderColor = 'rgba(99,102,241,0.5)';
-          e.target.style.boxShadow = '0 0 0 3px rgba(99,102,241,0.08)';
+          e.target.style.borderColor = 'rgba(249,115,22,0.5)';
+          e.target.style.boxShadow = '0 0 0 3px rgba(249,115,22,0.08)';
         }}
         onBlur={e => {
           e.target.style.borderColor = 'var(--border-2)';
@@ -59,8 +59,8 @@ function NF({ label, value, onChange, min, max }: {
         onChange={e => onChange(Number(e.target.value))}
         style={iStyle}
         onFocus={e => {
-          e.target.style.borderColor = 'rgba(99,102,241,0.5)';
-          e.target.style.boxShadow = '0 0 0 3px rgba(99,102,241,0.08)';
+          e.target.style.borderColor = 'rgba(249,115,22,0.5)';
+          e.target.style.boxShadow = '0 0 0 3px rgba(249,115,22,0.08)';
         }}
         onBlur={e => {
           e.target.style.borderColor = 'var(--border-2)';
@@ -106,7 +106,7 @@ export default function NewCampaign() {
       <div style={{ maxWidth: 540, margin: '0 auto' }}>
 
         <div style={{ marginBottom: 26 }}>
-          <a href="/" style={{ fontSize: 12, color: 'var(--indigo)', textDecoration: 'none', fontWeight: 500 }}>← Campaigns</a>
+          <a href="/" style={{ fontSize: 12, color: 'var(--accent)', textDecoration: 'none', fontWeight: 500 }}>← Campaigns</a>
           <h1 style={{
             fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 400,
             color: 'var(--text)', margin: '10px 0 4px', letterSpacing: '0.01em',
@@ -148,7 +148,7 @@ export default function NewCampaign() {
                   placeholder="AS_… (leave blank to use default from env)" />
                 {!form.unosendApiKey && (
                   <p style={{ margin: '5px 0 0', fontSize: 11, color: 'var(--muted)', fontFamily: 'var(--font-mono)' }}>
-                    ✓ Default key from <code style={{ color: 'var(--indigo)', background: 'rgba(99,102,241,0.08)', padding: '1px 5px', borderRadius: 4 }}>AUTOSEND_API_KEY</code> env will be used
+                    ✓ Default key from <code style={{ color: 'var(--accent)', background: 'rgba(249,115,22,0.08)', padding: '1px 5px', borderRadius: 4 }}>AUTOSEND_API_KEY</code> env will be used
                   </p>
                 )}
               </div>
@@ -175,7 +175,7 @@ export default function NewCampaign() {
               <button
                 type="submit" disabled={submitting}
                 style={{
-                  width: '100%', background: submitting ? 'rgba(99,102,241,0.4)' : 'var(--indigo)',
+                  width: '100%', background: submitting ? 'rgba(249,115,22,0.4)' : 'var(--accent)',
                   color: '#fff', border: 'none', borderRadius: 9,
                   padding: '12px 0', fontSize: 14, fontWeight: 600,
                   cursor: submitting ? 'not-allowed' : 'pointer',
