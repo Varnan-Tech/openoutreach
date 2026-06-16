@@ -782,10 +782,10 @@ export default function CampaignPage() {
                                 style={{
                                   position: 'absolute', top: 8, right: 8,
                                   width: 16, height: 16, borderRadius: 4,
-                                  border: `1px solid ${selectedIds.has(r.id) ? 'rgba(99,102,241,0.7)' : 'rgba(255,255,255,0.15)'}`,
-                                  background: selectedIds.has(r.id) ? 'rgba(99,102,241,0.3)' : 'transparent',
+                                  border: `1px solid ${selectedIds.has(r.id) ? 'rgba(249,115,22,0.7)' : 'rgba(255,255,255,0.15)'}`,
+                                  background: selectedIds.has(r.id) ? 'rgba(249,115,22,0.3)' : 'transparent',
                                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                  cursor: 'pointer', fontSize: 9, color: '#818CF8',
+                                  cursor: 'pointer', fontSize: 9, color: 'var(--accent)',
                                   transition: 'all 0.12s',
                                 }}
                               >
@@ -793,8 +793,9 @@ export default function CampaignPage() {
                               </div>
                             )}
                             <div style={{
-                              fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 400,
+                              fontFamily: 'var(--font-ui)', fontSize: 13, fontWeight: 600,
                               color: 'var(--text)', marginBottom: company ? 2 : 4, lineHeight: 1.3,
+                              letterSpacing: '-0.01em',
                             }}>
                               {displayName}
                             </div>
@@ -818,15 +819,14 @@ export default function CampaignPage() {
                             )}
                             {r._opens > 0 && r.stage !== 'opened' && (
                               <div style={{ marginTop: 6, display: 'inline-flex', alignItems: 'center', gap: 4, background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: 4, padding: '2px 7px' }}>
-                                <span style={{ fontSize: 9 }}>👁</span>
                                 <span style={{ fontSize: 9, fontFamily: 'var(--font-mono)', fontWeight: 700, color: '#F59E0B', letterSpacing: '0.05em' }}>
                                   {r._opens}× opened
                                 </span>
                               </div>
                             )}
                             {r.stage === 'completed' && (
-                              <div style={{ marginTop: 6, display: 'inline-flex', alignItems: 'center', gap: 4, background: 'rgba(139,92,246,0.1)', border: '1px solid rgba(139,92,246,0.25)', borderRadius: 4, padding: '2px 7px' }}>
-                                <span style={{ fontSize: 9, fontFamily: 'var(--font-mono)', fontWeight: 700, color: '#8B5CF6', letterSpacing: '0.05em' }}>✓ Done</span>
+                              <div style={{ marginTop: 6, display: 'inline-flex', alignItems: 'center', gap: 4, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 4, padding: '2px 7px' }}>
+                                <span style={{ fontSize: 9, fontFamily: 'var(--font-mono)', fontWeight: 600, color: 'var(--muted)', letterSpacing: '0.05em' }}>done</span>
                               </div>
                             )}
                             {r.stage === 'new' && (
@@ -835,9 +835,9 @@ export default function CampaignPage() {
                                 disabled={sending === r.id}
                                 style={{
                                   marginTop: 8,
-                                  background: 'rgba(99,102,241,0.1)',
-                                  color: '#6366F1',
-                                  border: '1px solid rgba(99,102,241,0.2)',
+                                  background: 'rgba(249,115,22,0.1)',
+                                  color: 'var(--accent)',
+                                  border: '1px solid rgba(249,115,22,0.2)',
                                   borderRadius: 5, padding: '4px 10px',
                                   fontSize: 10, fontWeight: 700,
                                   cursor: sending === r.id ? 'not-allowed' : 'pointer',
