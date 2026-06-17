@@ -10,18 +10,18 @@ type FormState = {
 
 const iStyle: React.CSSProperties = {
   width: '100%', boxSizing: 'border-box',
-  border: '1px solid var(--border-2)',
-  borderRadius: 8, padding: '9px 12px',
+  border: '1px solid var(--border)',
+  borderRadius: 6, padding: '8px 12px',
   fontSize: 13, color: 'var(--text)',
-  background: 'var(--surface-2)', outline: 'none',
+  background: 'var(--surface)', outline: 'none',
   transition: 'border-color 0.15s, box-shadow 0.15s',
   fontFamily: 'inherit',
 };
 
 const lStyle: React.CSSProperties = {
-  fontSize: 11, fontWeight: 600, color: 'var(--dim)',
+  fontSize: 12, fontWeight: 500, color: 'var(--body)',
   marginBottom: 6, display: 'block',
-  textTransform: 'uppercase', letterSpacing: '0.07em',
+  letterSpacing: '-0.01em',
 };
 
 function TF({ label, value, onChange, placeholder, required }: {
@@ -36,8 +36,8 @@ function TF({ label, value, onChange, placeholder, required }: {
         onChange={e => onChange(e.target.value)}
         style={iStyle}
         onFocus={e => {
-          e.target.style.borderColor = 'rgba(249,115,22,0.5)';
-          e.target.style.boxShadow = '0 0 0 3px rgba(249,115,22,0.08)';
+          e.target.style.borderColor = 'rgba(23,23,23,0.4)';
+          e.target.style.boxShadow = '0 0 0 3px rgba(23,23,23,0.06)';
         }}
         onBlur={e => {
           e.target.style.borderColor = 'var(--border-2)';
@@ -59,8 +59,8 @@ function NF({ label, value, onChange, min, max }: {
         onChange={e => onChange(Number(e.target.value))}
         style={iStyle}
         onFocus={e => {
-          e.target.style.borderColor = 'rgba(249,115,22,0.5)';
-          e.target.style.boxShadow = '0 0 0 3px rgba(249,115,22,0.08)';
+          e.target.style.borderColor = 'rgba(23,23,23,0.4)';
+          e.target.style.boxShadow = '0 0 0 3px rgba(23,23,23,0.06)';
         }}
         onBlur={e => {
           e.target.style.borderColor = 'var(--border-2)';
@@ -148,7 +148,7 @@ export default function NewCampaign() {
                   placeholder="AS_… (leave blank to use default from env)" />
                 {!form.unosendApiKey && (
                   <p style={{ margin: '5px 0 0', fontSize: 11, color: 'var(--muted)', fontFamily: 'var(--font-mono)' }}>
-                    ✓ Default key from <code style={{ color: 'var(--accent)', background: 'rgba(249,115,22,0.08)', padding: '1px 5px', borderRadius: 4 }}>AUTOSEND_API_KEY</code> env will be used
+                    ✓ Default key from <code style={{ color: 'var(--accent)', background: 'rgba(23,23,23,0.06)', padding: '1px 5px', borderRadius: 4 }}>AUTOSEND_API_KEY</code> env will be used
                   </p>
                 )}
               </div>
@@ -175,7 +175,7 @@ export default function NewCampaign() {
               <button
                 type="submit" disabled={submitting}
                 style={{
-                  width: '100%', background: submitting ? 'rgba(249,115,22,0.4)' : 'var(--accent)',
+                  width: '100%', background: submitting ? 'rgba(23,23,23,0.3)' : 'var(--accent)',
                   color: '#fff', border: 'none', borderRadius: 9,
                   padding: '12px 0', fontSize: 14, fontWeight: 600,
                   cursor: submitting ? 'not-allowed' : 'pointer',
