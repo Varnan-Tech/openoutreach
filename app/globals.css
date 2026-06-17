@@ -1,33 +1,35 @@
 @import "tailwindcss";
 
 :root {
-  /* Dark theme tokens — never pure black (#000), use dark gray per research */
-  --bg:          #0F1117;
-  --surface:     #161B27;
-  --surface-2:   #1E2436;
-  --border:      rgba(255,255,255,0.07);
-  --border-2:    rgba(255,255,255,0.12);
-  --text:        #E8EAF0;
-  --muted:       rgba(232,234,240,0.5);
-  --dim:         rgba(232,234,240,0.22);
+  /* Light theme — Vercel-inspired canvas/ink system */
+  --bg:        #fafafa;
+  --surface:   #ffffff;
+  --surface-2: #f5f5f5;
+  --border:    #ebebeb;
+  --border-2:  #a1a1a1;
+  --text:      #171717;
+  --body:      #4d4d4d;
+  --muted:     #888888;
+  --dim:       #a1a1a1;
 
-  /* Primary action accent — warm orange, replaces AI-purple indigo */
-  --accent:      #F97316;
-  --accent-pale: rgba(249,115,22,0.10);
+  /* Primary action — ink black (no colored accent) */
+  --accent:      #171717;
+  --accent-pale: rgba(23,23,23,0.06);
+  --on-accent:   #ffffff;
 
-  /* Semantic status colors — do not use for UI chrome */
-  --amber:       #F59E0B;  /* opened */
-  --amber-pale:  rgba(245,158,11,0.1);
-  --emerald:     #10B981;  /* replied */
-  --emerald-pale:rgba(16,185,129,0.1);
-  --coral:       #FB7185;  /* bounced */
-  --coral-pale:  rgba(251,113,133,0.1);
-  --violet:      #8B5CF6;  /* completed — semantic only */
+  /* Semantic status colors — functional only, not UI chrome */
+  --amber:       #F59E0B;
+  --amber-pale:  rgba(245,158,11,0.08);
+  --emerald:     #10B981;
+  --emerald-pale:rgba(16,185,129,0.08);
+  --coral:       #ee0000;
+  --coral-pale:  rgba(238,0,0,0.08);
+  --violet:      #8B5CF6;
 
   /* Font families — loaded by layout.tsx */
-  --font-display: var(--font-fraunces, Georgia, serif);
+  --font-display: var(--font-inter, Inter, system-ui, sans-serif);
   --font-mono:    var(--font-dm-mono, 'Courier New', monospace);
-  --font-ui:      var(--font-outfit, system-ui, sans-serif);
+  --font-ui:      var(--font-inter, Inter, system-ui, sans-serif);
 }
 
 @theme inline {
@@ -44,12 +46,12 @@ html, body {
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(255,255,255,0.1) transparent;
+  scrollbar-color: rgba(0,0,0,0.12) transparent;
 }
 
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.1);
+  background: rgba(0,0,0,0.12);
   border-radius: 3px;
 }
 
@@ -60,7 +62,7 @@ html, body {
 }
 
 .skeleton {
-  background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%);
+  background: linear-gradient(90deg, rgba(0,0,0,0.04) 25%, rgba(0,0,0,0.07) 50%, rgba(0,0,0,0.04) 75%);
   background-size: 800px 100%;
   animation: shimmer 1.4s ease-in-out infinite;
   border-radius: 6px;
