@@ -36,8 +36,8 @@ function TF({ label, value, onChange, placeholder, required }: {
         onChange={e => onChange(e.target.value)}
         style={iStyle}
         onFocus={e => {
-          e.target.style.borderColor = 'rgba(23,23,23,0.4)';
-          e.target.style.boxShadow = '0 0 0 3px rgba(23,23,23,0.06)';
+          e.target.style.borderColor = 'rgba(0,112,243,0.5)';
+          e.target.style.boxShadow = '0 0 0 3px rgba(0,112,243,0.12)';
         }}
         onBlur={e => {
           e.target.style.borderColor = 'var(--border)';
@@ -59,8 +59,8 @@ function NF({ label, value, onChange, min, max }: {
         onChange={e => onChange(Number(e.target.value))}
         style={iStyle}
         onFocus={e => {
-          e.target.style.borderColor = 'rgba(23,23,23,0.4)';
-          e.target.style.boxShadow = '0 0 0 3px rgba(23,23,23,0.06)';
+          e.target.style.borderColor = 'rgba(0,112,243,0.5)';
+          e.target.style.boxShadow = '0 0 0 3px rgba(0,112,243,0.12)';
         }}
         onBlur={e => {
           e.target.style.borderColor = 'var(--border)';
@@ -102,11 +102,11 @@ export default function NewCampaign() {
   }
 
   return (
-    <div style={{ background: 'var(--bg)', minHeight: 'calc(100vh - 52px)', padding: '36px 32px', fontFamily: 'var(--font-ui)' }}>
-      <div style={{ maxWidth: 540, margin: '0 auto' }}>
+    <div style={{ background: 'var(--bg)', minHeight: 'calc(100vh - 52px)', padding: '36px 32px', fontFamily: 'var(--font-ui)', position: 'relative' }}>
+      <div style={{ maxWidth: 540, margin: '0 auto', position: 'relative' }}>
 
         <div style={{ marginBottom: 26 }}>
-          <a href="/" style={{ fontSize: 12, color: 'var(--accent)', textDecoration: 'none', fontWeight: 500 }}>← Campaigns</a>
+          <a href="/" style={{ fontSize: 12, color: 'var(--link)', textDecoration: 'none', fontWeight: 500 }}>← Campaigns</a>
           <h1 style={{
             fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 400,
             color: 'var(--text)', margin: '10px 0 4px', letterSpacing: '0.01em',

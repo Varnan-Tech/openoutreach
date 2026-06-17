@@ -12,10 +12,22 @@
   --muted:     #888888;
   --dim:       #a1a1a1;
 
-  /* Primary action — ink black (no colored accent) */
+  /* Primary action — ink black (CTAs only) */
   --accent:      #171717;
   --accent-pale: rgba(23,23,23,0.06);
   --on-accent:   #ffffff;
+
+  /* Interactive accent — Vercel signature blue (links, focus, active, selection) */
+  --link:        #0070f3;
+  --link-deep:   #0761d1;
+  --link-pale:   rgba(0,112,243,0.08);
+
+  /* Stacked light-mode elevation (DESIGN.md Level 2 / Level 5) — never a heavy dark drop */
+  --shadow-card:  0 1px 2px rgba(0,0,0,0.04), 0 4px 12px -4px rgba(0,0,0,0.06);
+  --shadow-modal: 0 1px 1px rgba(0,0,0,0.02), 0 8px 16px -4px rgba(0,0,0,0.05), 0 24px 32px -8px rgba(0,0,0,0.08);
+
+  /* Signature mesh gradient stops (cyan / blue / violet / magenta) */
+  --gradient-brand: linear-gradient(90deg, #007cf0 0%, #00dfd8 28%, #7928ca 64%, #ff0080 100%);
 
   /* Semantic status colors — functional only, not UI chrome */
   --amber:       #F59E0B;
@@ -53,6 +65,18 @@ html, body {
 ::-webkit-scrollbar-thumb {
   background: rgba(0,0,0,0.12);
   border-radius: 3px;
+}
+
+/* Signature mesh gradient — the brand's only decorative chrome. Hero scale only. */
+.mesh {
+  background:
+    radial-gradient(at 8% 0%,   rgba(0,124,240,0.20)  0px, transparent 45%),
+    radial-gradient(at 42% 0%,  rgba(0,223,216,0.14)  0px, transparent 45%),
+    radial-gradient(at 72% 0%,  rgba(121,40,202,0.16) 0px, transparent 45%),
+    radial-gradient(at 100% 0%, rgba(255,0,128,0.14)  0px, transparent 45%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, transparent 100%);
+          mask-image: linear-gradient(to bottom, #000 0%, transparent 100%);
+  pointer-events: none;
 }
 
 /* Skeleton loader shimmer */

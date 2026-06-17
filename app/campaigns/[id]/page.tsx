@@ -404,8 +404,8 @@ export default function CampaignPage() {
             <button
               onClick={() => setShowSteps(s => !s)}
               style={{
-                background: showSteps ? 'rgba(255,255,255,0.09)' : 'rgba(255,255,255,0.04)',
-                border: `1px solid ${showSteps ? 'var(--border-2)' : 'rgba(255,255,255,0.12)'}`,
+                background: showSteps ? 'rgba(0,0,0,0.06)' : 'rgba(0,0,0,0.04)',
+                border: `1px solid ${showSteps ? 'var(--border-2)' : 'var(--border)'}`,
                 borderRadius: 6, height: 30, padding: '0 12px',
                 display: 'flex', alignItems: 'center', gap: 6,
                 cursor: 'pointer', color: showSteps ? 'var(--text)' : 'var(--muted)',
@@ -413,7 +413,7 @@ export default function CampaignPage() {
                 transition: 'all 0.15s', flexShrink: 0, position: 'relative',
               }}
               onMouseOver={e => { e.currentTarget.style.borderColor = 'var(--border-2)'; e.currentTarget.style.color = 'var(--text)'; }}
-              onMouseOut={e => { if (!showSteps) { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'; e.currentTarget.style.color = 'var(--muted)'; } }}
+              onMouseOut={e => { if (!showSteps) { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--muted)'; } }}
             >
               Email Template & Follow-up
               {steps.length > 0 && (
@@ -429,8 +429,8 @@ export default function CampaignPage() {
             <button
               onClick={() => setShowUpload(s => !s)}
               style={{
-                background: showUpload ? 'rgba(255,255,255,0.09)' : 'rgba(255,255,255,0.04)',
-                border: `1px solid ${showUpload ? 'var(--border-2)' : 'rgba(255,255,255,0.12)'}`,
+                background: showUpload ? 'rgba(0,0,0,0.06)' : 'rgba(0,0,0,0.04)',
+                border: `1px solid ${showUpload ? 'var(--border-2)' : 'var(--border)'}`,
                 borderRadius: 6, height: 30, padding: '0 12px',
                 display: 'flex', alignItems: 'center',
                 cursor: 'pointer', color: showUpload ? 'var(--text)' : 'var(--muted)',
@@ -438,23 +438,23 @@ export default function CampaignPage() {
                 transition: 'all 0.15s', flexShrink: 0,
               }}
               onMouseOver={e => { e.currentTarget.style.borderColor = 'var(--border-2)'; e.currentTarget.style.color = 'var(--text)'; }}
-              onMouseOut={e => { if (!showUpload) { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'; e.currentTarget.style.color = 'var(--muted)'; } }}
+              onMouseOut={e => { if (!showUpload) { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--muted)'; } }}
             >
               Import CSV
             </button>
             <button
               onClick={() => setShowAddLead(s => !s)}
               style={{
-                background: showAddLead ? 'rgba(249,115,22,0.12)' : 'rgba(255,255,255,0.04)',
-                border: `1px solid ${showAddLead ? 'rgba(249,115,22,0.35)' : 'rgba(255,255,255,0.12)'}`,
+                background: showAddLead ? 'rgba(0,112,243,0.12)' : 'rgba(0,0,0,0.04)',
+                border: `1px solid ${showAddLead ? 'rgba(0,112,243,0.35)' : 'var(--border)'}`,
                 borderRadius: 6, height: 30, padding: '0 12px',
                 display: 'flex', alignItems: 'center',
                 cursor: 'pointer', color: showAddLead ? 'var(--accent)' : 'var(--muted)',
                 fontSize: 11, fontWeight: 600, fontFamily: 'var(--font-mono)',
                 transition: 'all 0.15s', flexShrink: 0,
               }}
-              onMouseOver={e => { e.currentTarget.style.borderColor = 'rgba(249,115,22,0.35)'; e.currentTarget.style.color = 'var(--accent)'; }}
-              onMouseOut={e => { if (!showAddLead) { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'; e.currentTarget.style.color = 'var(--muted)'; } }}
+              onMouseOver={e => { e.currentTarget.style.borderColor = 'rgba(0,112,243,0.35)'; e.currentTarget.style.color = 'var(--accent)'; }}
+              onMouseOut={e => { if (!showAddLead) { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--muted)'; } }}
             >
               + Add Lead
             </button>
@@ -494,8 +494,8 @@ export default function CampaignPage() {
                 setShowSettings(s => !s);
               }}
               style={{
-                background: showSettings ? 'rgba(255,255,255,0.09)' : 'rgba(255,255,255,0.04)',
-                border: `1px solid ${showSettings ? 'var(--border-2)' : 'rgba(255,255,255,0.12)'}`,
+                background: showSettings ? 'rgba(0,0,0,0.06)' : 'rgba(0,0,0,0.04)',
+                border: `1px solid ${showSettings ? 'var(--border-2)' : 'var(--border)'}`,
                 borderRadius: 6, height: 30, padding: '0 12px',
                 display: 'flex', alignItems: 'center',
                 cursor: 'pointer', color: showSettings ? 'var(--text)' : 'var(--muted)',
@@ -503,7 +503,7 @@ export default function CampaignPage() {
                 transition: 'all 0.15s', flexShrink: 0,
               }}
               onMouseOver={e => { e.currentTarget.style.borderColor = 'var(--border-2)'; e.currentTarget.style.color = 'var(--text)'; }}
-              onMouseOut={e => { if (!showSettings) { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'; e.currentTarget.style.color = 'var(--muted)'; } }}
+              onMouseOut={e => { if (!showSettings) { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--muted)'; } }}
             >
               Settings
             </button>
@@ -553,7 +553,7 @@ export default function CampaignPage() {
           {/* Total */}
           <div style={{
             padding: '9px 18px', borderRadius: 8, flexShrink: 0,
-            background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
+            background: 'rgba(0,0,0,0.03)', border: '1px solid var(--border)',
             display: 'flex', flexDirection: 'column', gap: 5, minWidth: 72,
           }}>
             <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 300, color: 'var(--text)', letterSpacing: '-0.03em', lineHeight: 1 }}>{String(recipients.length)}</div>
@@ -564,10 +564,10 @@ export default function CampaignPage() {
           <div style={{ width: 1, background: 'var(--border-2)', flexShrink: 0, margin: '2px 4px' }} />
 
           {/* Sequence group */}
-          <div style={{ display: 'flex', gap: 1, background: 'rgba(249,115,22,0.08)', borderRadius: 9, padding: 3, border: '1px solid rgba(249,115,22,0.22)', flexShrink: 0 }}>
+          <div style={{ display: 'flex', gap: 1, background: 'rgba(0,112,243,0.08)', borderRadius: 9, padding: 3, border: '1px solid rgba(0,112,243,0.22)', flexShrink: 0 }}>
             <div style={{ padding: '7px 16px', borderRadius: 7, display: 'flex', flexDirection: 'column', gap: 5 }}>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 300, color: 'var(--accent)', letterSpacing: '-0.03em', lineHeight: 1 }}>{String(counts.in_sequence || 0)}</div>
-              <div style={{ fontSize: 9, color: 'rgba(249,115,22,0.7)', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'var(--font-mono)' }}>In Seq</div>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 300, color: 'var(--text)', letterSpacing: '-0.03em', lineHeight: 1 }}>{String(counts.in_sequence || 0)}</div>
+              <div style={{ fontSize: 9, color: 'var(--link-deep)', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'var(--font-mono)' }}>In Seq</div>
             </div>
           </div>
 
@@ -578,8 +578,8 @@ export default function CampaignPage() {
               { label: 'Open %', value: openRate === '—' ? '—' : `${openRate}%` },
             ].map(({ label, value }, i, arr) => (
               <div key={label} style={{ padding: '7px 16px', borderRadius: 7, display: 'flex', flexDirection: 'column', gap: 5, borderRight: i < arr.length - 1 ? '1px solid rgba(245,158,11,0.15)' : 'none' }}>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 300, color: '#FBB740', letterSpacing: '-0.03em', lineHeight: 1 }}>{value}</div>
-                <div style={{ fontSize: 9, color: '#FCD34D', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'var(--font-mono)' }}>{label}</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 300, color: 'var(--text)', letterSpacing: '-0.03em', lineHeight: 1 }}>{value}</div>
+                <div style={{ fontSize: 9, color: '#b45309', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'var(--font-mono)' }}>{label}</div>
               </div>
             ))}
           </div>
@@ -591,8 +591,8 @@ export default function CampaignPage() {
               { label: 'Reply %', value: replyRate === '—' ? '—' : `${replyRate}%` },
             ].map(({ label, value }, i, arr) => (
               <div key={label} style={{ padding: '7px 16px', borderRadius: 7, display: 'flex', flexDirection: 'column', gap: 5, borderRight: i < arr.length - 1 ? '1px solid rgba(16,185,129,0.15)' : 'none' }}>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 300, color: '#34D399', letterSpacing: '-0.03em', lineHeight: 1 }}>{value}</div>
-                <div style={{ fontSize: 9, color: '#6EE7B7', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'var(--font-mono)' }}>{label}</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 300, color: 'var(--text)', letterSpacing: '-0.03em', lineHeight: 1 }}>{value}</div>
+                <div style={{ fontSize: 9, color: '#047857', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'var(--font-mono)' }}>{label}</div>
               </div>
             ))}
           </div>
@@ -600,8 +600,8 @@ export default function CampaignPage() {
           {/* Bounced */}
           <div style={{ display: 'flex', background: 'rgba(251,113,133,0.08)', borderRadius: 9, padding: 3, border: '1px solid rgba(251,113,133,0.22)', flexShrink: 0 }}>
             <div style={{ padding: '7px 16px', borderRadius: 7, display: 'flex', flexDirection: 'column', gap: 5 }}>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 300, color: '#FB7185', letterSpacing: '-0.03em', lineHeight: 1 }}>{String(counts.bounced || 0)}</div>
-              <div style={{ fontSize: 9, color: '#FCA5A5', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'var(--font-mono)' }}>Bounced</div>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 300, color: 'var(--text)', letterSpacing: '-0.03em', lineHeight: 1 }}>{String(counts.bounced || 0)}</div>
+              <div style={{ fontSize: 9, color: '#be123c', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'var(--font-mono)' }}>Bounced</div>
             </div>
           </div>
         </div>
@@ -634,13 +634,13 @@ export default function CampaignPage() {
                 <button
                   onClick={exportCSV}
                   style={{
-                    background: 'none', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 5,
+                    background: 'none', border: '1px solid var(--border)', borderRadius: 5,
                     padding: '3px 10px', fontSize: 9, fontWeight: 700, color: 'var(--muted)',
                     cursor: 'pointer', fontFamily: 'var(--font-mono)', letterSpacing: '0.06em',
                     textTransform: 'uppercase' as const, transition: 'all 0.12s',
                   }}
-                  onMouseOver={e => { e.currentTarget.style.borderColor = 'rgba(249,115,22,0.4)'; e.currentTarget.style.color = 'var(--accent)'; }}
-                  onMouseOut={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = 'var(--muted)'; }}
+                  onMouseOver={e => { e.currentTarget.style.borderColor = 'rgba(0,112,243,0.4)'; e.currentTarget.style.color = 'var(--accent)'; }}
+                  onMouseOut={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--muted)'; }}
                 >
                   ↓ Export CSV
                 </button>
@@ -649,7 +649,7 @@ export default function CampaignPage() {
             {selectedIds.size > 0 && (
               <div style={{
                 marginBottom: 12, display: 'flex', alignItems: 'center', gap: 12,
-                background: 'rgba(249,115,22,0.08)', border: '1px solid rgba(249,115,22,0.2)',
+                background: 'rgba(0,112,243,0.08)', border: '1px solid rgba(0,112,243,0.2)',
                 borderRadius: 8, padding: '8px 14px',
               }}>
                 <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--accent)', fontFamily: 'var(--font-mono)' }}>
@@ -679,8 +679,8 @@ export default function CampaignPage() {
                     className="oo-kanban-col"
                     style={{
                       minWidth: 210, maxWidth: 210, flexShrink: 0,
-                      background: isEmpty ? 'rgba(255,255,255,0.02)' : 'var(--surface)',
-                      border: `1px solid ${isEmpty ? 'rgba(255,255,255,0.09)' : 'var(--border)'}`,
+                      background: isEmpty ? 'rgba(0,0,0,0.02)' : 'var(--surface)',
+                      border: `1px solid ${isEmpty ? 'rgba(0,0,0,0.06)' : 'var(--border)'}`,
                       borderRadius: 10, overflow: 'hidden',
                       borderTop: `2px solid ${isEmpty ? col.color + '55' : col.color}`,
                       animationDelay: `${idx * 45}ms`,
@@ -700,7 +700,7 @@ export default function CampaignPage() {
                       }} />
                       <span style={{
                         fontSize: 9, fontWeight: 700,
-                        color: isEmpty ? 'var(--muted)' : 'var(--text)',
+                        color: 'var(--text)',
                         textTransform: 'uppercase', letterSpacing: '0.1em',
                         flex: 1, fontFamily: 'var(--font-mono)',
                       }}>
@@ -742,7 +742,7 @@ export default function CampaignPage() {
                       {isEmpty ? (
                         <div style={{
                           margin: '4px 0 2px',
-                          border: '1px dashed rgba(255,255,255,0.1)',
+                          border: '1px dashed var(--border)',
                           borderRadius: 6, padding: '14px 0',
                           textAlign: 'center',
                           color: 'var(--muted)',
@@ -760,8 +760,8 @@ export default function CampaignPage() {
                             key={r.id}
                             onClick={() => openDetail(r.id)}
                             style={{
-                              background: 'rgba(255,255,255,0.06)',
-                              border: '1px solid rgba(255,255,255,0.11)',
+                              background: 'rgba(0,0,0,0.04)',
+                              border: '1px solid var(--border)',
                               borderRadius: 8, padding: '10px 11px',
                               transition: 'border-color 0.12s, background 0.12s',
                               cursor: 'pointer',
@@ -772,8 +772,8 @@ export default function CampaignPage() {
                               e.currentTarget.style.background = `${col.color}12`;
                             }}
                             onMouseOut={e => {
-                              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.11)';
-                              e.currentTarget.style.background = 'rgba(255,255,255,0.06)';
+                              e.currentTarget.style.borderColor = 'var(--border)';
+                              e.currentTarget.style.background = 'rgba(0,0,0,0.04)';
                             }}
                           >
                             {r.stage === 'new' && (
@@ -782,8 +782,8 @@ export default function CampaignPage() {
                                 style={{
                                   position: 'absolute', top: 8, right: 8,
                                   width: 16, height: 16, borderRadius: 4,
-                                  border: `1px solid ${selectedIds.has(r.id) ? 'rgba(249,115,22,0.7)' : 'rgba(255,255,255,0.15)'}`,
-                                  background: selectedIds.has(r.id) ? 'rgba(249,115,22,0.3)' : 'transparent',
+                                  border: `1px solid ${selectedIds.has(r.id) ? 'rgba(0,112,243,0.7)' : 'rgba(0,0,0,0.12)'}`,
+                                  background: selectedIds.has(r.id) ? 'rgba(0,112,243,0.3)' : 'transparent',
                                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                                   cursor: 'pointer', fontSize: 9, color: 'var(--accent)',
                                   transition: 'all 0.12s',
@@ -825,7 +825,7 @@ export default function CampaignPage() {
                               </div>
                             )}
                             {r.stage === 'completed' && (
-                              <div style={{ marginTop: 6, display: 'inline-flex', alignItems: 'center', gap: 4, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 4, padding: '2px 7px' }}>
+                              <div style={{ marginTop: 6, display: 'inline-flex', alignItems: 'center', gap: 4, background: 'rgba(0,0,0,0.03)', border: '1px solid var(--border)', borderRadius: 4, padding: '2px 7px' }}>
                                 <span style={{ fontSize: 9, fontFamily: 'var(--font-mono)', fontWeight: 600, color: 'var(--muted)', letterSpacing: '0.05em' }}>done</span>
                               </div>
                             )}
@@ -835,9 +835,9 @@ export default function CampaignPage() {
                                 disabled={sending === r.id}
                                 style={{
                                   marginTop: 8,
-                                  background: 'rgba(249,115,22,0.1)',
+                                  background: 'rgba(0,112,243,0.1)',
                                   color: 'var(--accent)',
-                                  border: '1px solid rgba(249,115,22,0.2)',
+                                  border: '1px solid rgba(0,112,243,0.2)',
                                   borderRadius: 5, padding: '4px 10px',
                                   fontSize: 10, fontWeight: 700,
                                   cursor: sending === r.id ? 'not-allowed' : 'pointer',
@@ -881,13 +881,13 @@ export default function CampaignPage() {
               border: '1px solid var(--border-2)',
               borderRadius: 16, padding: '24px 26px',
               width: 460, maxWidth: 'calc(100vw - 40px)',
-              boxShadow: '0 24px 60px rgba(0,0,0,0.5)',
+              boxShadow: 'var(--shadow-modal)',
             }}
           >
             {/* Header */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
               <div>
-                <div style={{ fontSize: 9, fontWeight: 700, color: 'var(--indigo)', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'var(--font-mono)', marginBottom: 3 }}>
+                <div style={{ fontSize: 9, fontWeight: 700, color: 'var(--link)', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'var(--font-mono)', marginBottom: 3 }}>
                   Upload Recipients
                 </div>
                 <div style={{ fontFamily: 'var(--font-display)', fontSize: 16, fontWeight: 400, color: 'var(--text)' }}>
@@ -912,26 +912,26 @@ export default function CampaignPage() {
             {/* Hint */}
             <div style={{ fontSize: 11, color: 'var(--dim)', marginBottom: 16, lineHeight: 1.6 }}>
               CSV needs an{' '}
-              <code style={{ fontFamily: 'var(--font-mono)', background: 'rgba(255,255,255,0.07)', padding: '1px 6px', borderRadius: 3, fontSize: 10, color: 'var(--text)' }}>email</code>
+              <code style={{ fontFamily: 'var(--font-mono)', background: 'rgba(0,0,0,0.06)', padding: '1px 6px', borderRadius: 3, fontSize: 10, color: 'var(--text)' }}>email</code>
               {' '}column. Extra columns become{' '}
-              <code style={{ fontFamily: 'var(--font-mono)', background: 'rgba(255,255,255,0.07)', padding: '1px 6px', borderRadius: 3, fontSize: 10, color: 'var(--text)' }}>{`{{merge_variables}}`}</code>.
+              <code style={{ fontFamily: 'var(--font-mono)', background: 'rgba(0,0,0,0.06)', padding: '1px 6px', borderRadius: 3, fontSize: 10, color: 'var(--text)' }}>{`{{merge_variables}}`}</code>.
             </div>
             <input ref={fileRef} type="file" accept=".csv" style={{ display: 'none' }}
               onChange={e => { const f = e.target.files?.[0]; if (f) { uploadCSV(f); setShowUpload(false); } e.target.value = ''; }} />
             <button
               onClick={() => fileRef.current?.click()} disabled={uploading}
               style={{
-                width: '100%', background: 'rgba(249,115,22,0.04)',
-                border: '1px dashed rgba(249,115,22,0.25)', borderRadius: 10,
+                width: '100%', background: 'rgba(0,112,243,0.04)',
+                border: '1px dashed rgba(0,112,243,0.25)', borderRadius: 10,
                 padding: '32px 0', fontSize: 13, fontWeight: 500,
-                color: uploading ? 'var(--indigo)' : 'var(--dim)',
+                color: uploading ? 'var(--link)' : 'var(--dim)',
                 cursor: uploading ? 'not-allowed' : 'pointer',
                 transition: 'border-color 0.15s, color 0.15s, background 0.15s',
                 fontFamily: 'var(--font-mono)', letterSpacing: '0.04em',
                 display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
               }}
-              onMouseOver={e => { if (!uploading) { e.currentTarget.style.borderColor = 'rgba(249,115,22,0.5)'; e.currentTarget.style.color = 'var(--indigo)'; e.currentTarget.style.background = 'rgba(249,115,22,0.08)'; } }}
-              onMouseOut={e => { e.currentTarget.style.borderColor = 'rgba(249,115,22,0.25)'; e.currentTarget.style.color = 'var(--dim)'; e.currentTarget.style.background = 'rgba(249,115,22,0.04)'; }}
+              onMouseOver={e => { if (!uploading) { e.currentTarget.style.borderColor = 'rgba(0,112,243,0.5)'; e.currentTarget.style.color = 'var(--link)'; e.currentTarget.style.background = 'rgba(0,112,243,0.08)'; } }}
+              onMouseOut={e => { e.currentTarget.style.borderColor = 'rgba(0,112,243,0.25)'; e.currentTarget.style.color = 'var(--dim)'; e.currentTarget.style.background = 'rgba(0,112,243,0.04)'; }}
             >
               <span style={{ fontSize: 22, opacity: 0.5 }}>↑</span>
               <span>{uploading ? 'uploading···' : 'click to upload .csv'}</span>
@@ -949,11 +949,11 @@ export default function CampaignPage() {
           onClick={() => { setShowAddLead(false); setSingleLead({ email: '' }); setNewFieldName(''); }}
           style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
         >
-          <div onClick={e => e.stopPropagation()} style={{ background: 'var(--surface)', border: '1px solid var(--border-2)', borderRadius: 16, padding: '24px 26px', width: 460, maxWidth: 'calc(100vw - 40px)', boxShadow: '0 24px 60px rgba(0,0,0,0.5)', maxHeight: '80vh', overflowY: 'auto' }}>
+          <div onClick={e => e.stopPropagation()} style={{ background: 'var(--surface)', border: '1px solid var(--border-2)', borderRadius: 16, padding: '24px 26px', width: 460, maxWidth: 'calc(100vw - 40px)', boxShadow: 'var(--shadow-modal)', maxHeight: '80vh', overflowY: 'auto' }}>
             {/* Header */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
               <div>
-                <div style={{ fontSize: 9, fontWeight: 700, color: 'var(--indigo)', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'var(--font-mono)', marginBottom: 3 }}>
+                <div style={{ fontSize: 9, fontWeight: 700, color: 'var(--link)', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'var(--font-mono)', marginBottom: 3 }}>
                   Add Lead
                 </div>
                 <div style={{ fontFamily: 'var(--font-display)', fontSize: 16, fontWeight: 400, color: 'var(--text)' }}>
@@ -975,7 +975,7 @@ export default function CampaignPage() {
                 <input type="email" required style={iStyle} placeholder="lead@company.com"
                   value={singleLead.email ?? ''}
                   onChange={e => setSingleLead(p => ({ ...p, email: e.target.value }))}
-                  onFocus={e => (e.target.style.borderColor = 'rgba(249,115,22,0.4)')}
+                  onFocus={e => (e.target.style.borderColor = 'rgba(0,112,243,0.4)')}
                   onBlur={e => (e.target.style.borderColor = 'var(--border-2)')} />
               </div>
 
@@ -986,7 +986,7 @@ export default function CampaignPage() {
                   <input type="text" style={iStyle} placeholder={`{{${key}}}`}
                     value={singleLead[key] ?? ''}
                     onChange={e => setSingleLead(p => ({ ...p, [key]: e.target.value }))}
-                    onFocus={e => (e.target.style.borderColor = 'rgba(249,115,22,0.4)')}
+                    onFocus={e => (e.target.style.borderColor = 'rgba(0,112,243,0.4)')}
                     onBlur={e => (e.target.style.borderColor = 'var(--border-2)')} />
                 </div>
               ))}
@@ -999,7 +999,7 @@ export default function CampaignPage() {
                     <input type="text" style={iStyle} placeholder={`{{${key}}}`}
                       value={singleLead[key] ?? ''}
                       onChange={e => setSingleLead(p => ({ ...p, [key]: e.target.value }))}
-                      onFocus={e => (e.target.style.borderColor = 'rgba(249,115,22,0.4)')}
+                      onFocus={e => (e.target.style.borderColor = 'rgba(0,112,243,0.4)')}
                       onBlur={e => (e.target.style.borderColor = 'var(--border-2)')} />
                   </div>
                   <button type="button" onClick={() => setSingleLead(p => { const n = { ...p }; delete n[key]; return n; })}
@@ -1014,7 +1014,7 @@ export default function CampaignPage() {
                   <input type="text" style={{ ...iStyle, flex: 1 }} placeholder="e.g. company, title, city"
                     value={newFieldName}
                     onChange={e => setNewFieldName(e.target.value.replace(/\s/g, '_').toLowerCase())}
-                    onFocus={e => (e.target.style.borderColor = 'rgba(249,115,22,0.4)')}
+                    onFocus={e => (e.target.style.borderColor = 'rgba(0,112,243,0.4)')}
                     onBlur={e => (e.target.style.borderColor = 'var(--border-2)')}
                     onKeyDown={e => {
                       if (e.key === 'Enter') {
@@ -1026,14 +1026,14 @@ export default function CampaignPage() {
                     }} />
                   <button type="button"
                     onClick={() => { const k = newFieldName.trim(); if (k && k !== 'email' && !(k in singleLead)) { setSingleLead(p => ({ ...p, [k]: '' })); } setNewFieldName(''); }}
-                    style={{ background: 'rgba(249,115,22,0.1)', border: '1px solid rgba(249,115,22,0.2)', borderRadius: 6, padding: '0 14px', fontSize: 13, color: 'var(--accent)', cursor: 'pointer', flexShrink: 0, fontWeight: 600 }}>
+                    style={{ background: 'rgba(0,112,243,0.1)', border: '1px solid rgba(0,112,243,0.2)', borderRadius: 6, padding: '0 14px', fontSize: 13, color: 'var(--accent)', cursor: 'pointer', flexShrink: 0, fontWeight: 600 }}>
                     +
                   </button>
                 </div>
               </div>
 
               <button type="submit" disabled={addingLead} style={{
-                background: addingLead ? 'rgba(249,115,22,0.4)' : 'var(--accent)',
+                background: addingLead ? 'rgba(0,112,243,0.4)' : 'var(--accent)',
                 color: '#fff', border: 'none', borderRadius: 8, padding: '10px 0',
                 fontSize: 12, fontWeight: 700, cursor: addingLead ? 'not-allowed' : 'pointer',
                 fontFamily: 'var(--font-mono)', letterSpacing: '0.05em', textTransform: 'uppercase', marginTop: 4,
@@ -1065,7 +1065,7 @@ export default function CampaignPage() {
               width: 540, maxWidth: 'calc(100vw - 40px)',
               maxHeight: 'calc(100vh - 80px)',
               display: 'flex', flexDirection: 'column',
-              boxShadow: '0 24px 60px rgba(0,0,0,0.5)',
+              boxShadow: 'var(--shadow-modal)',
               overflow: 'hidden',
             }}
           >
@@ -1075,7 +1075,7 @@ export default function CampaignPage() {
               display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0,
             }}>
               <div>
-                <div style={{ fontSize: 9, fontWeight: 700, color: 'var(--indigo)', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'var(--font-mono)', marginBottom: 3 }}>
+                <div style={{ fontSize: 9, fontWeight: 700, color: 'var(--link)', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'var(--font-mono)', marginBottom: 3 }}>
                   Email Template & Follow-up
                 </div>
                 <div style={{ fontFamily: 'var(--font-display)', fontSize: 16, fontWeight: 400, color: 'var(--text)' }}>
@@ -1087,7 +1087,7 @@ export default function CampaignPage() {
                   <button
                     onClick={() => setShowAddStep(true)}
                     style={{
-                      background: 'rgba(249,115,22,0.1)', border: '1px solid rgba(249,115,22,0.25)',
+                      background: 'rgba(0,112,243,0.1)', border: '1px solid rgba(0,112,243,0.25)',
                       borderRadius: 6, padding: '5px 12px',
                       fontSize: 10, fontWeight: 700, color: 'var(--accent)',
                       cursor: 'pointer', fontFamily: 'var(--font-mono)',
@@ -1115,12 +1115,12 @@ export default function CampaignPage() {
 
             {/* Variables bar */}
             {dataKeys.length > 0 && (
-              <div style={{ padding: '10px 14px', borderBottom: '1px solid var(--border)', background: 'rgba(249,115,22,0.04)', flexShrink: 0 }}>
+              <div style={{ padding: '10px 14px', borderBottom: '1px solid var(--border)', background: 'rgba(0,112,243,0.04)', flexShrink: 0 }}>
                 <div style={{ fontSize: 9, fontWeight: 700, color: 'var(--dim)', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'var(--font-mono)' }}>Available variables</div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
                   {dataKeys.map(key => (
                     <span key={key} style={{
-                      background: 'rgba(249,115,22,0.1)', border: '1px solid rgba(249,115,22,0.2)',
+                      background: 'rgba(0,112,243,0.1)', border: '1px solid rgba(0,112,243,0.2)',
                       borderRadius: 5, padding: '2px 8px', fontSize: 10, fontWeight: 600,
                       color: 'var(--accent)', fontFamily: 'var(--font-mono)',
                     }}>
@@ -1151,12 +1151,12 @@ export default function CampaignPage() {
                       transition: 'border-color 0.15s, box-shadow 0.15s',
                       display: 'flex', gap: 13, alignItems: 'flex-start',
                     }}
-                    onMouseOver={e => { e.currentTarget.style.borderColor = 'rgba(249,115,22,0.4)'; e.currentTarget.style.boxShadow = '0 0 0 1px rgba(249,115,22,0.12)'; }}
+                    onMouseOver={e => { e.currentTarget.style.borderColor = 'rgba(0,112,243,0.4)'; e.currentTarget.style.boxShadow = '0 0 0 1px rgba(0,112,243,0.12)'; }}
                     onMouseOut={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.boxShadow = 'none'; }}
                   >
                     <div style={{
                       width: 30, height: 30, borderRadius: '50%', flexShrink: 0,
-                      background: 'rgba(249,115,22,0.1)', border: '1px solid rgba(249,115,22,0.25)',
+                      background: 'rgba(0,112,243,0.1)', border: '1px solid rgba(0,112,243,0.25)',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       fontSize: 11, fontWeight: 700, color: 'var(--accent)',
                       fontFamily: 'var(--font-mono)', marginTop: 1,
@@ -1164,8 +1164,8 @@ export default function CampaignPage() {
                       {step.stepNumber}
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 7, overflow: 'hidden' }}>
-                        <div style={{ padding: '7px 11px', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <div style={{ background: 'rgba(0,0,0,0.03)', border: '1px solid rgba(0,0,0,0.04)', borderRadius: 7, overflow: 'hidden' }}>
+                        <div style={{ padding: '7px 11px', borderBottom: '1px solid rgba(0,0,0,0.03)', display: 'flex', alignItems: 'center', gap: 8 }}>
                           <span style={{ fontSize: 9, color: 'var(--dim)', fontFamily: 'var(--font-mono)', flexShrink: 0, textTransform: 'uppercase', letterSpacing: '0.07em' }}>Subject</span>
                           <span style={{ fontSize: 12, fontWeight: 500, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                             {step.subjectTemplate || '(no subject)'}
@@ -1180,8 +1180,8 @@ export default function CampaignPage() {
                       <span style={{
                         fontSize: 9, fontFamily: 'var(--font-mono)', fontWeight: 600,
                         color: step.delayDaysFromPrevious === 0 ? 'var(--dim)' : '#F59E0B',
-                        background: step.delayDaysFromPrevious === 0 ? 'rgba(255,255,255,0.04)' : 'rgba(245,158,11,0.08)',
-                        border: `1px solid ${step.delayDaysFromPrevious === 0 ? 'rgba(255,255,255,0.08)' : 'rgba(245,158,11,0.2)'}`,
+                        background: step.delayDaysFromPrevious === 0 ? 'rgba(0,0,0,0.04)' : 'rgba(245,158,11,0.08)',
+                        border: `1px solid ${step.delayDaysFromPrevious === 0 ? 'rgba(0,0,0,0.06)' : 'rgba(245,158,11,0.2)'}`,
                         padding: '3px 7px', borderRadius: 4, textTransform: 'uppercase', letterSpacing: '0.06em',
                       }}>
                         {step.delayDaysFromPrevious === 0 ? 'immediate' : `+${step.delayDaysFromPrevious}d`}
@@ -1201,8 +1201,8 @@ export default function CampaignPage() {
 
               {/* Add step form */}
               {showAddStep && (
-                <form onSubmit={addStep} style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border)', borderRadius: 10, padding: 16 }}>
-                  <div style={{ fontSize: 9, fontWeight: 700, color: 'var(--indigo)', marginBottom: 14, fontFamily: 'var(--font-mono)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                <form onSubmit={addStep} style={{ background: 'rgba(0,0,0,0.02)', border: '1px solid var(--border)', borderRadius: 10, padding: 16 }}>
+                  <div style={{ fontSize: 9, fontWeight: 700, color: 'var(--link)', marginBottom: 14, fontFamily: 'var(--font-mono)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
                     Step {(steps[steps.length - 1]?.stepNumber ?? 0) + 1}
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 12, marginBottom: 12 }}>
@@ -1210,14 +1210,14 @@ export default function CampaignPage() {
                       <label style={{ fontSize: 9, fontWeight: 700, color: 'var(--dim)', marginBottom: 5, display: 'block', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'var(--font-mono)' }}>Subject</label>
                       <input type="text" required style={iStyle} placeholder="Hey {{first_name}}!"
                         value={draft.subject} onChange={e => setDraft(d => ({ ...d, subject: e.target.value }))}
-                        onFocus={e => (e.target.style.borderColor = 'rgba(249,115,22,0.4)')}
+                        onFocus={e => (e.target.style.borderColor = 'rgba(0,112,243,0.4)')}
                         onBlur={e => (e.target.style.borderColor = 'var(--border-2)')} />
                     </div>
                     <div>
                       <label style={{ fontSize: 9, fontWeight: 700, color: 'var(--dim)', marginBottom: 5, display: 'block', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'var(--font-mono)' }}>Delay (days)</label>
                       <input type="number" min={0} style={iStyle}
                         value={draft.delayDays} onChange={e => setDraft(d => ({ ...d, delayDays: Number(e.target.value) }))}
-                        onFocus={e => (e.target.style.borderColor = 'rgba(249,115,22,0.4)')}
+                        onFocus={e => (e.target.style.borderColor = 'rgba(0,112,243,0.4)')}
                         onBlur={e => (e.target.style.borderColor = 'var(--border-2)')} />
                     </div>
                   </div>
@@ -1229,13 +1229,13 @@ export default function CampaignPage() {
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginBottom: 8 }}>
                         {dataKeys.map(key => (
                           <button key={key} type="button" onClick={() => insertVar(key)} style={{
-                            background: 'rgba(249,115,22,0.1)', border: '1px solid rgba(249,115,22,0.2)',
+                            background: 'rgba(0,112,243,0.1)', border: '1px solid rgba(0,112,243,0.2)',
                             borderRadius: 5, padding: '3px 8px', fontSize: 10, fontWeight: 600,
                             color: 'var(--accent)', cursor: 'pointer', fontFamily: 'var(--font-mono)',
                             transition: 'all 0.1s',
                           }}
-                          onMouseOver={e => { e.currentTarget.style.background = 'rgba(249,115,22,0.2)'; e.currentTarget.style.borderColor = 'rgba(249,115,22,0.4)'; }}
-                          onMouseOut={e => { e.currentTarget.style.background = 'rgba(249,115,22,0.1)'; e.currentTarget.style.borderColor = 'rgba(249,115,22,0.2)'; }}
+                          onMouseOver={e => { e.currentTarget.style.background = 'rgba(0,112,243,0.2)'; e.currentTarget.style.borderColor = 'rgba(0,112,243,0.4)'; }}
+                          onMouseOut={e => { e.currentTarget.style.background = 'rgba(0,112,243,0.1)'; e.currentTarget.style.borderColor = 'rgba(0,112,243,0.2)'; }}
                           >
                             {`{{${key}}}`}
                           </button>
@@ -1245,12 +1245,12 @@ export default function CampaignPage() {
                     <textarea ref={bodyRef} required rows={5} style={{ ...iStyle, resize: 'none' as const }}
                       placeholder={"Hi {{first_name}},\n\nYour message here...\n\nBest,\nYour Name"}
                       value={draft.bodyText} onChange={e => setDraft(d => ({ ...d, bodyText: e.target.value }))}
-                      onFocus={e => (e.target.style.borderColor = 'rgba(249,115,22,0.4)')}
+                      onFocus={e => (e.target.style.borderColor = 'rgba(0,112,243,0.4)')}
                       onBlur={e => (e.target.style.borderColor = 'var(--border-2)')} />
                   </div>
                   <div style={{ display: 'flex', gap: 10 }}>
                     <button type="submit" disabled={addingStep} style={{
-                      background: addingStep ? 'rgba(249,115,22,0.4)' : 'var(--accent)', color: '#fff', border: 'none',
+                      background: addingStep ? 'rgba(0,112,243,0.4)' : 'var(--accent)', color: '#fff', border: 'none',
                       padding: '8px 16px', borderRadius: 7, fontSize: 12, fontWeight: 700,
                       cursor: addingStep ? 'not-allowed' : 'pointer', fontFamily: 'var(--font-mono)',
                       letterSpacing: '0.04em', textTransform: 'uppercase',
@@ -1288,7 +1288,7 @@ export default function CampaignPage() {
               width: 560, maxWidth: 'calc(100vw - 40px)',
               maxHeight: 'calc(100vh - 80px)',
               display: 'flex', flexDirection: 'column',
-              boxShadow: '0 24px 60px rgba(0,0,0,0.55)',
+              boxShadow: 'var(--shadow-modal)',
               overflow: 'hidden',
             }}
           >
@@ -1302,8 +1302,8 @@ export default function CampaignPage() {
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <div style={{
                   width: 26, height: 26, borderRadius: '50%',
-                  background: 'rgba(249,115,22,0.12)',
-                  border: '1px solid rgba(249,115,22,0.3)',
+                  background: 'rgba(0,112,243,0.12)',
+                  border: '1px solid rgba(0,112,243,0.3)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   fontSize: 10, fontWeight: 700, color: 'var(--accent)',
                   fontFamily: 'var(--font-mono)',
@@ -1311,7 +1311,7 @@ export default function CampaignPage() {
                   {selectedStep.stepNumber}
                 </div>
                 <div>
-                  <div style={{ fontSize: 9, fontWeight: 700, color: 'var(--indigo)', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'var(--font-mono)', marginBottom: 2 }}>
+                  <div style={{ fontSize: 9, fontWeight: 700, color: 'var(--link)', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'var(--font-mono)', marginBottom: 2 }}>
                     Email Step {selectedStep.stepNumber}
                   </div>
                   <div style={{ fontSize: 11, color: 'var(--muted)', fontFamily: 'var(--font-mono)' }}>
@@ -1337,17 +1337,17 @@ export default function CampaignPage() {
 
             {/* Variables bar */}
             {dataKeys.length > 0 && (
-              <div style={{ padding: '10px 20px', borderBottom: '1px solid var(--border)', background: 'rgba(249,115,22,0.04)', flexShrink: 0 }}>
+              <div style={{ padding: '10px 20px', borderBottom: '1px solid var(--border)', background: 'rgba(0,112,243,0.04)', flexShrink: 0 }}>
                 <div style={{ fontSize: 9, fontWeight: 700, color: 'var(--dim)', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'var(--font-mono)' }}>Available variables — click to insert</div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
                   {dataKeys.map(key => (
                     <button key={key} type="button" onClick={() => insertVarEdit(key)} style={{
-                      background: 'rgba(249,115,22,0.1)', border: '1px solid rgba(249,115,22,0.2)',
+                      background: 'rgba(0,112,243,0.1)', border: '1px solid rgba(0,112,243,0.2)',
                       borderRadius: 5, padding: '2px 8px', fontSize: 10, fontWeight: 600,
                       color: 'var(--accent)', cursor: 'pointer', fontFamily: 'var(--font-mono)', transition: 'all 0.1s',
                     }}
-                    onMouseOver={e => { e.currentTarget.style.background = 'rgba(249,115,22,0.2)'; e.currentTarget.style.borderColor = 'rgba(249,115,22,0.4)'; }}
-                    onMouseOut={e => { e.currentTarget.style.background = 'rgba(249,115,22,0.1)'; e.currentTarget.style.borderColor = 'rgba(249,115,22,0.2)'; }}
+                    onMouseOver={e => { e.currentTarget.style.background = 'rgba(0,112,243,0.2)'; e.currentTarget.style.borderColor = 'rgba(0,112,243,0.4)'; }}
+                    onMouseOut={e => { e.currentTarget.style.background = 'rgba(0,112,243,0.1)'; e.currentTarget.style.borderColor = 'rgba(0,112,243,0.2)'; }}
                     >
                       {`{{${key}}}`}
                     </button>
@@ -1364,7 +1364,7 @@ export default function CampaignPage() {
                   <input type="text" required style={iStyle} placeholder="Hey {{first_name}}!"
                     value={editDraft.subject}
                     onChange={e => setEditDraft(d => ({ ...d, subject: e.target.value }))}
-                    onFocus={e => (e.target.style.borderColor = 'rgba(249,115,22,0.4)')}
+                    onFocus={e => (e.target.style.borderColor = 'rgba(0,112,243,0.4)')}
                     onBlur={e => (e.target.style.borderColor = 'var(--border-2)')} />
                 </div>
                 <div>
@@ -1372,7 +1372,7 @@ export default function CampaignPage() {
                   <input type="number" min={0} style={iStyle}
                     value={editDraft.delayDays}
                     onChange={e => setEditDraft(d => ({ ...d, delayDays: Number(e.target.value) }))}
-                    onFocus={e => (e.target.style.borderColor = 'rgba(249,115,22,0.4)')}
+                    onFocus={e => (e.target.style.borderColor = 'rgba(0,112,243,0.4)')}
                     onBlur={e => (e.target.style.borderColor = 'var(--border-2)')} />
                 </div>
               </div>
@@ -1382,12 +1382,12 @@ export default function CampaignPage() {
                   placeholder={"Hi {{first_name}},\n\nYour message here...\n\nBest,\nYour Name"}
                   value={editDraft.bodyText}
                   onChange={e => setEditDraft(d => ({ ...d, bodyText: e.target.value }))}
-                  onFocus={e => (e.target.style.borderColor = 'rgba(249,115,22,0.4)')}
+                  onFocus={e => (e.target.style.borderColor = 'rgba(0,112,243,0.4)')}
                   onBlur={e => (e.target.style.borderColor = 'var(--border-2)')} />
               </div>
               <div style={{ display: 'flex', gap: 10, paddingBottom: 4 }}>
                 <button type="submit" disabled={savingStep} style={{
-                  background: savingStep ? 'rgba(249,115,22,0.4)' : 'var(--accent)', color: '#fff', border: 'none',
+                  background: savingStep ? 'rgba(0,112,243,0.4)' : 'var(--accent)', color: '#fff', border: 'none',
                   padding: '9px 20px', borderRadius: 7, fontSize: 12, fontWeight: 700,
                   cursor: savingStep ? 'not-allowed' : 'pointer', fontFamily: 'var(--font-mono)',
                   letterSpacing: '0.04em', textTransform: 'uppercase',
@@ -1427,7 +1427,7 @@ export default function CampaignPage() {
               background: 'var(--surface)',
               borderLeft: '1px solid var(--border-2)',
               display: 'flex', flexDirection: 'column',
-              boxShadow: '-20px 0 60px rgba(0,0,0,0.4)',
+              boxShadow: '-12px 0 40px rgba(0,0,0,0.12)',
             }}
           >
             {detailRecipient._loading ? (
@@ -1453,7 +1453,7 @@ export default function CampaignPage() {
                           {displayName}
                         </div>
                         {company && <div style={{ fontSize: 12, color: 'var(--muted)', marginBottom: 5 }}>{company}</div>}
-                        <a href={`mailto:${detailRecipient.email}`} style={{ fontSize: 11, color: 'var(--accent)', fontFamily: 'var(--font-mono)', textDecoration: 'none' }}>
+                        <a href={`mailto:${detailRecipient.email}`} style={{ fontSize: 11, color: 'var(--link)', fontFamily: 'var(--font-mono)', textDecoration: 'none' }}>
                           {detailRecipient.email}
                         </a>
                       </div>
@@ -1478,8 +1478,8 @@ export default function CampaignPage() {
                           onClick={() => changeStage(detailRecipient.id, s.id)}
                           disabled={detailRecipient.stage === s.id}
                           style={{
-                            background: detailRecipient.stage === s.id ? `${s.color}20` : 'rgba(255,255,255,0.04)',
-                            border: `1px solid ${detailRecipient.stage === s.id ? s.color + '50' : 'rgba(255,255,255,0.1)'}`,
+                            background: detailRecipient.stage === s.id ? `${s.color}20` : 'rgba(0,0,0,0.04)',
+                            border: `1px solid ${detailRecipient.stage === s.id ? s.color + '50' : 'var(--border)'}`,
                             borderRadius: 5, padding: '3px 10px',
                             fontSize: 9, fontWeight: 700, color: detailRecipient.stage === s.id ? s.color : 'var(--muted)',
                             cursor: detailRecipient.stage === s.id ? 'default' : 'pointer',
@@ -1487,7 +1487,7 @@ export default function CampaignPage() {
                             transition: 'all 0.12s',
                           }}
                           onMouseOver={e => { if (detailRecipient.stage !== s.id) { e.currentTarget.style.borderColor = s.color + '60'; e.currentTarget.style.color = s.color; } }}
-                          onMouseOut={e => { if (detailRecipient.stage !== s.id) { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = 'var(--muted)'; } }}
+                          onMouseOut={e => { if (detailRecipient.stage !== s.id) { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--muted)'; } }}
                         >
                           {s.label}
                         </button>
@@ -1506,7 +1506,7 @@ export default function CampaignPage() {
                       {sends.length === 0 ? (
                         <div style={{ fontSize: 12, color: 'var(--dim)', fontStyle: 'italic' }}>No emails sent yet</div>
                       ) : sends.map((s: any) => (
-                        <div key={s.id} style={{ marginBottom: 8, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 8, padding: '10px 12px', borderLeft: `2px solid ${STATUS_COLOR[s.status] ?? '#64748B'}` }}>
+                        <div key={s.id} style={{ marginBottom: 8, background: 'rgba(0,0,0,0.03)', border: '1px solid rgba(0,0,0,0.06)', borderRadius: 8, padding: '10px 12px', borderLeft: `2px solid ${STATUS_COLOR[s.status] ?? '#64748B'}` }}>
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 4 }}>
                             <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text)' }}>
                               Step {s.step?.stepNumber ?? '?'} — {s.step?.subjectTemplate ?? ''}
@@ -1524,7 +1524,7 @@ export default function CampaignPage() {
                                 👁 {s.opens}× · {fmt(s.lastOpenedAt)}
                               </span>
                             ) : s.status === 'sent' ? (
-                              <span style={{ fontSize: 9, fontFamily: 'var(--font-mono)', color: 'var(--dim)', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 4, padding: '2px 7px' }}>
+                              <span style={{ fontSize: 9, fontFamily: 'var(--font-mono)', color: 'var(--dim)', background: 'rgba(0,0,0,0.04)', border: '1px solid rgba(0,0,0,0.06)', borderRadius: 4, padding: '2px 7px' }}>
                                 👁 not opened
                               </span>
                             ) : null}
@@ -1572,7 +1572,7 @@ export default function CampaignPage() {
                       <button
                         onClick={() => { sendNow(detailRecipient.id); setDetailRecipient(null); }}
                         disabled={sending === detailRecipient.id}
-                        style={{ flex: 1, background: 'rgba(249,115,22,0.12)', color: 'var(--accent)', border: '1px solid rgba(249,115,22,0.3)', borderRadius: 7, padding: '8px 0', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'var(--font-mono)', letterSpacing: '0.06em', textTransform: 'uppercase' as const }}
+                        style={{ flex: 1, background: 'rgba(0,112,243,0.12)', color: 'var(--accent)', border: '1px solid rgba(0,112,243,0.3)', borderRadius: 7, padding: '8px 0', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'var(--font-mono)', letterSpacing: '0.06em', textTransform: 'uppercase' as const }}
                       >
                         ▶ Send Now
                       </button>
@@ -1607,7 +1607,7 @@ export default function CampaignPage() {
               maxWidth: 'calc(100vw - 40px)',
               maxHeight: 'calc(100vh - 60px)',
               overflowY: 'auto',
-              boxShadow: '0 24px 60px rgba(0,0,0,0.5)',
+              boxShadow: 'var(--shadow-modal)',
             }}
           >
             {/* Dialog header */}
@@ -1616,7 +1616,7 @@ export default function CampaignPage() {
               marginBottom: 20,
             }}>
               <div>
-                <div style={{ fontSize: 9, fontWeight: 700, color: 'var(--indigo)', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'var(--font-mono)', marginBottom: 4 }}>
+                <div style={{ fontSize: 9, fontWeight: 700, color: 'var(--link)', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'var(--font-mono)', marginBottom: 4 }}>
                   Campaign Settings
                 </div>
                 <div style={{ fontFamily: 'var(--font-display)', fontSize: 17, fontWeight: 400, color: 'var(--text)', letterSpacing: '0.01em' }}>
@@ -1653,7 +1653,7 @@ export default function CampaignPage() {
                     <input type="text" required value={settingsDraft.name}
                       onChange={e => setSettingsDraft(d => d ? { ...d, name: e.target.value } : d)}
                       style={iStyle}
-                      onFocus={e => (e.target.style.borderColor = 'rgba(249,115,22,0.5)')}
+                      onFocus={e => (e.target.style.borderColor = 'rgba(0,112,243,0.5)')}
                       onBlur={e => (e.target.style.borderColor = 'var(--border-2)')} />
                   </div>
                   <div>
@@ -1661,7 +1661,7 @@ export default function CampaignPage() {
                     <input type="text" required value={settingsDraft.fromName}
                       onChange={e => setSettingsDraft(d => d ? { ...d, fromName: e.target.value } : d)}
                       style={iStyle}
-                      onFocus={e => (e.target.style.borderColor = 'rgba(249,115,22,0.5)')}
+                      onFocus={e => (e.target.style.borderColor = 'rgba(0,112,243,0.5)')}
                       onBlur={e => (e.target.style.borderColor = 'var(--border-2)')} />
                   </div>
                 </div>
@@ -1670,7 +1670,7 @@ export default function CampaignPage() {
                   <input type="email" required value={settingsDraft.fromEmail}
                     onChange={e => setSettingsDraft(d => d ? { ...d, fromEmail: e.target.value } : d)}
                     style={iStyle}
-                    onFocus={e => (e.target.style.borderColor = 'rgba(249,115,22,0.5)')}
+                    onFocus={e => (e.target.style.borderColor = 'rgba(0,112,243,0.5)')}
                     onBlur={e => (e.target.style.borderColor = 'var(--border-2)')} />
                 </div>
                 <div>
@@ -1678,7 +1678,7 @@ export default function CampaignPage() {
                   <input type="text" value={settingsDraft.unosendApiKey}
                     onChange={e => setSettingsDraft(d => d ? { ...d, unosendApiKey: e.target.value } : d)}
                     style={iStyle} placeholder="AS_..."
-                    onFocus={e => (e.target.style.borderColor = 'rgba(249,115,22,0.5)')}
+                    onFocus={e => (e.target.style.borderColor = 'rgba(0,112,243,0.5)')}
                     onBlur={e => (e.target.style.borderColor = 'var(--border-2)')} />
                 </div>
 
@@ -1693,7 +1693,7 @@ export default function CampaignPage() {
                       <input type="number" min={0} max={23} required value={settingsDraft.sendWindowStart}
                         onChange={e => setSettingsDraft(d => d ? { ...d, sendWindowStart: Number(e.target.value) } : d)}
                         style={iStyle}
-                        onFocus={e => (e.target.style.borderColor = 'rgba(249,115,22,0.5)')}
+                        onFocus={e => (e.target.style.borderColor = 'rgba(0,112,243,0.5)')}
                         onBlur={e => (e.target.style.borderColor = 'var(--border-2)')} />
                       <div style={{ fontSize: 10, color: 'var(--dim)', marginTop: 3 }}>19 = 7 PM</div>
                     </div>
@@ -1702,7 +1702,7 @@ export default function CampaignPage() {
                       <input type="number" min={0} max={23} required value={settingsDraft.sendWindowEnd}
                         onChange={e => setSettingsDraft(d => d ? { ...d, sendWindowEnd: Number(e.target.value) } : d)}
                         style={iStyle}
-                        onFocus={e => (e.target.style.borderColor = 'rgba(249,115,22,0.5)')}
+                        onFocus={e => (e.target.style.borderColor = 'rgba(0,112,243,0.5)')}
                         onBlur={e => (e.target.style.borderColor = 'var(--border-2)')} />
                       <div style={{ fontSize: 10, color: 'var(--dim)', marginTop: 3 }}>23 = 11 PM</div>
                     </div>
@@ -1712,7 +1712,7 @@ export default function CampaignPage() {
                     <input type="text" required value={settingsDraft.sendWindowDays}
                       onChange={e => setSettingsDraft(d => d ? { ...d, sendWindowDays: e.target.value } : d)}
                       style={iStyle} placeholder="Mon,Tue,Wed,Thu,Fri,Sat"
-                      onFocus={e => (e.target.style.borderColor = 'rgba(249,115,22,0.5)')}
+                      onFocus={e => (e.target.style.borderColor = 'rgba(0,112,243,0.5)')}
                       onBlur={e => (e.target.style.borderColor = 'var(--border-2)')} />
                     <div style={{ fontSize: 10, color: 'var(--dim)', marginTop: 3 }}>Comma-separated: Mon,Tue,Wed,Thu,Fri,Sat,Sun</div>
                   </div>
@@ -1722,7 +1722,7 @@ export default function CampaignPage() {
                       <input type="text" required value={settingsDraft.tz}
                         onChange={e => setSettingsDraft(d => d ? { ...d, tz: e.target.value } : d)}
                         style={iStyle} placeholder="Asia/Kolkata"
-                        onFocus={e => (e.target.style.borderColor = 'rgba(249,115,22,0.5)')}
+                        onFocus={e => (e.target.style.borderColor = 'rgba(0,112,243,0.5)')}
                         onBlur={e => (e.target.style.borderColor = 'var(--border-2)')} />
                     </div>
                     <div>
@@ -1730,7 +1730,7 @@ export default function CampaignPage() {
                       <input type="number" min={1} required value={settingsDraft.dailyCap}
                         onChange={e => setSettingsDraft(d => d ? { ...d, dailyCap: Number(e.target.value) } : d)}
                         style={iStyle}
-                        onFocus={e => (e.target.style.borderColor = 'rgba(249,115,22,0.5)')}
+                        onFocus={e => (e.target.style.borderColor = 'rgba(0,112,243,0.5)')}
                         onBlur={e => (e.target.style.borderColor = 'var(--border-2)')} />
                       <div style={{ fontSize: 10, color: 'var(--dim)', marginTop: 3 }}>Max emails to send per day</div>
                     </div>
@@ -1740,7 +1740,7 @@ export default function CampaignPage() {
                 {/* Save */}
                 <div style={{ display: 'flex', gap: 10, marginTop: 4 }}>
                   <button type="submit" disabled={savingSettings} style={{
-                    flex: 1, background: savingSettings ? 'rgba(249,115,22,0.4)' : 'var(--accent)',
+                    flex: 1, background: savingSettings ? 'rgba(0,112,243,0.4)' : 'var(--accent)',
                     color: '#fff', border: 'none', borderRadius: 8,
                     padding: '10px 0', fontSize: 13, fontWeight: 600,
                     cursor: savingSettings ? 'not-allowed' : 'pointer', fontFamily: 'inherit',

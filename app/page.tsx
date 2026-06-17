@@ -43,8 +43,8 @@ export default function Home() {
   }, []);
 
   return (
-    <div style={{ background: 'var(--bg)', minHeight: 'calc(100vh - 52px)', padding: '36px 32px' }}>
-      <div style={{ maxWidth: 860, margin: '0 auto' }}>
+    <div style={{ background: 'var(--bg)', minHeight: 'calc(100vh - 52px)', padding: '36px 32px', position: 'relative' }}>
+      <div style={{ maxWidth: 860, margin: '0 auto', position: 'relative' }}>
 
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 28 }}>
@@ -60,7 +60,7 @@ export default function Home() {
               fontSize: 28, fontWeight: 600, color: 'var(--text)', margin: 0,
               fontFamily: 'var(--font-ui)', letterSpacing: '-0.04em', lineHeight: 1.1,
             }}>
-              Your outreach campaigns
+              Your outreach campaigns.
             </h1>
           </div>
           <a

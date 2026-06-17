@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${inter.variable} ${dmMono.variable} h-full antialiased`}>
-      <body style={{ minHeight: "100vh" }}>
+      <body style={{ minHeight: "100vh" }} suppressHydrationWarning>
         {/* Global topbar */}
         <header style={{
           background: "var(--surface)",
@@ -35,6 +35,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           top: 0,
           zIndex: 100,
         }}>
+          {/* Brand gradient hairline — the signature mesh stops, sitewide */}
+          <span style={{
+            position: "absolute", left: 0, right: 0, bottom: -1, height: 2,
+            background: "#000000",
+          }} />
           <a href="/" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 1 }}>
             <span style={{
               fontFamily: "var(--font-ui)",
