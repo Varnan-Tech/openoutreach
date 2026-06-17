@@ -1,17 +1,11 @@
 import type { Metadata } from "next";
-import { Outfit, Fraunces, DM_Mono } from "next/font/google";
+import { Inter, DM_Mono } from "next/font/google";
 import "./globals.css";
 
-const outfit = Outfit({
-  variable: "--font-outfit",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-});
-
-const fraunces = Fraunces({
-  variable: "--font-fraunces",
-  subsets: ["latin"],
-  weight: ["300", "400", "500"],
+  weight: ["400", "500", "600"],
 });
 
 const dmMono = DM_Mono({
@@ -27,7 +21,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${outfit.variable} ${fraunces.variable} ${dmMono.variable} h-full antialiased`}>
+    <html lang="en" className={`${inter.variable} ${dmMono.variable} h-full antialiased`}>
       <body style={{ minHeight: "100vh" }}>
         {/* Global topbar */}
         <header style={{
@@ -41,29 +35,29 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           top: 0,
           zIndex: 100,
         }}>
-          <a href="/" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 0 }}>
+          <a href="/" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 1 }}>
             <span style={{
-              fontFamily: "var(--font-display)",
-              fontSize: 17,
-              fontWeight: 400,
+              fontFamily: "var(--font-ui)",
+              fontSize: 15,
+              fontWeight: 600,
               color: "var(--text)",
-              letterSpacing: "-0.01em",
+              letterSpacing: "-0.02em",
             }}>
               Open
             </span>
             <span style={{
               fontFamily: "var(--font-ui)",
-              fontSize: 14,
-              fontWeight: 500,
+              fontSize: 15,
+              fontWeight: 400,
               color: "var(--muted)",
-              letterSpacing: "0.01em",
+              letterSpacing: "-0.01em",
             }}>
               Outreach
             </span>
             <span style={{
-              marginLeft: 8,
-              width: 5,
-              height: 5,
+              marginLeft: 6,
+              width: 4,
+              height: 4,
               borderRadius: "50%",
               background: "var(--accent)",
               display: "inline-block",
