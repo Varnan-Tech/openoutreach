@@ -2,10 +2,10 @@
 import { useEffect, useState } from 'react';
 
 const STATUS: Record<string, { label: string; dot: string; text: string; bg: string }> = {
-  draft:     { label: 'Draft',     dot: '#64748B', text: 'rgba(232,234,240,0.4)',  bg: 'rgba(100,116,139,0.08)' },
-  active:    { label: 'Active',    dot: '#10B981', text: '#10B981',               bg: 'rgba(16,185,129,0.1)'  },
-  paused:    { label: 'Paused',    dot: '#F59E0B', text: '#F59E0B',               bg: 'rgba(245,158,11,0.1)'  },
-  completed: { label: 'Completed', dot: '#8B5CF6', text: '#8B5CF6',               bg: 'rgba(139,92,246,0.1)'  },
+  draft:     { label: 'Draft',     dot: '#a1a1a1', text: '#888888',  bg: 'rgba(0,0,0,0.04)' },
+  active:    { label: 'Active',    dot: '#10B981', text: '#10B981',  bg: 'rgba(16,185,129,0.08)'  },
+  paused:    { label: 'Paused',    dot: '#F59E0B', text: '#F59E0B',  bg: 'rgba(245,158,11,0.08)'  },
+  completed: { label: 'Completed', dot: '#8B5CF6', text: '#8B5CF6',  bg: 'rgba(139,92,246,0.08)'  },
 };
 
 function SkeletonRow() {
@@ -50,15 +50,15 @@ export default function Home() {
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 28 }}>
           <div>
             <div style={{
-              fontSize: 10, fontWeight: 700, letterSpacing: '0.1em',
-              color: 'var(--accent)', textTransform: 'uppercase', marginBottom: 6,
+              fontSize: 11, fontWeight: 500, letterSpacing: '0.06em',
+              color: 'var(--muted)', textTransform: 'uppercase', marginBottom: 8,
               fontFamily: 'var(--font-mono)',
             }}>
               Campaigns
             </div>
             <h1 style={{
-              fontSize: 28, fontWeight: 400, color: 'var(--text)', margin: 0,
-              fontFamily: 'var(--font-display)', letterSpacing: '-0.01em',
+              fontSize: 28, fontWeight: 600, color: 'var(--text)', margin: 0,
+              fontFamily: 'var(--font-ui)', letterSpacing: '-0.04em', lineHeight: 1.1,
             }}>
               Your outreach campaigns
             </h1>
@@ -66,14 +66,14 @@ export default function Home() {
           <a
             href="/campaigns/new"
             style={{
-              background: 'var(--accent)', color: '#fff', padding: '9px 18px',
-              borderRadius: 8, fontSize: 13, fontWeight: 600,
+              background: 'var(--accent)', color: 'var(--on-accent)', padding: '8px 18px',
+              borderRadius: 8, fontSize: 13, fontWeight: 500,
               textDecoration: 'none', fontFamily: 'var(--font-ui)',
               transition: 'opacity 0.15s, transform 0.15s',
               display: 'inline-block',
             }}
             onMouseOver={e => {
-              e.currentTarget.style.opacity = '0.88';
+              e.currentTarget.style.opacity = '0.8';
               e.currentTarget.style.transform = 'translateY(-1px)';
             }}
             onMouseOut={e => {
@@ -87,7 +87,7 @@ export default function Home() {
 
         {/* List */}
         {loading ? (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             <SkeletonRow />
             <SkeletonRow />
             <SkeletonRow />
@@ -98,25 +98,25 @@ export default function Home() {
             borderRadius: 12, padding: '72px 24px', textAlign: 'center',
           }}>
             <div style={{
-              fontFamily: 'var(--font-display)', fontSize: 32, fontWeight: 300,
-              color: 'var(--dim)', lineHeight: 1, marginBottom: 20,
-              letterSpacing: '-0.02em',
+              fontFamily: 'var(--font-ui)', fontSize: 24, fontWeight: 600,
+              color: 'var(--text)', lineHeight: 1.2, marginBottom: 12,
+              letterSpacing: '-0.03em',
             }}>
               No campaigns yet
             </div>
-            <p style={{ color: 'var(--muted)', fontSize: 13, margin: '0 0 24px', lineHeight: 1.6 }}>
+            <p style={{ color: 'var(--muted)', fontSize: 14, margin: '0 0 24px', lineHeight: 1.6 }}>
               Create your first campaign to start sending cold emails.
             </p>
             <a href="/campaigns/new" style={{
-              background: 'var(--accent)', color: '#fff', padding: '9px 20px',
-              borderRadius: 8, fontSize: 13, fontWeight: 600, textDecoration: 'none',
+              background: 'var(--accent)', color: 'var(--on-accent)', padding: '8px 20px',
+              borderRadius: 8, fontSize: 13, fontWeight: 500, textDecoration: 'none',
               display: 'inline-block',
             }}>
               Create campaign
             </a>
           </div>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
             {campaigns.map(c => {
               const s = STATUS[c.status] ?? STATUS.draft;
               return (
@@ -127,25 +127,24 @@ export default function Home() {
                     background: 'var(--surface)',
                     border: '1px solid var(--border)',
                     borderLeft: '3px solid transparent',
-                    borderRadius: 10, padding: '16px 20px',
+                    borderRadius: 8, padding: '14px 18px',
                     textDecoration: 'none', display: 'flex',
                     alignItems: 'center', gap: 16,
                     transition: 'border-left-color 0.15s, background 0.15s',
                   }}
                   onMouseOver={e => {
                     e.currentTarget.style.borderLeftColor = 'var(--accent)';
-                    e.currentTarget.style.background = 'rgba(255,255,255,0.02)';
+                    e.currentTarget.style.background = 'var(--surface-2)';
                   }}
                   onMouseOut={e => {
                     e.currentTarget.style.borderLeftColor = 'transparent';
                     e.currentTarget.style.background = 'var(--surface)';
                   }}
                 >
-                  {/* Name + sender */}
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{
-                      fontFamily: 'var(--font-ui)', fontSize: 15, fontWeight: 600,
-                      color: 'var(--text)', marginBottom: 3, letterSpacing: '-0.01em',
+                      fontFamily: 'var(--font-ui)', fontSize: 14, fontWeight: 600,
+                      color: 'var(--text)', marginBottom: 2, letterSpacing: '-0.01em',
                       whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
                     }}>
                       {c.name}
@@ -155,34 +154,32 @@ export default function Home() {
                     </div>
                   </div>
 
-                  {/* Metrics */}
-                  <div style={{ display: 'flex', gap: 28, flexShrink: 0 }}>
+                  <div style={{ display: 'flex', gap: 24, flexShrink: 0 }}>
                     <div style={{ textAlign: 'right' }}>
-                      <div style={{ fontFamily: 'var(--font-mono)', fontSize: 16, fontWeight: 400, color: 'var(--text)', letterSpacing: '-0.02em', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
+                      <div style={{ fontFamily: 'var(--font-mono)', fontSize: 15, fontWeight: 400, color: 'var(--text)', letterSpacing: '-0.02em', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
                         {c._count?.recipients ?? 0}
                       </div>
-                      <div style={{ fontSize: 9, color: 'var(--dim)', textTransform: 'uppercase', letterSpacing: '0.07em', marginTop: 3, fontFamily: 'var(--font-mono)' }}>
+                      <div style={{ fontSize: 9, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.07em', marginTop: 3, fontFamily: 'var(--font-mono)' }}>
                         Recipients
                       </div>
                     </div>
                     <div style={{ textAlign: 'right' }}>
-                      <div style={{ fontFamily: 'var(--font-mono)', fontSize: 16, fontWeight: 400, color: 'var(--muted)', letterSpacing: '-0.02em', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
+                      <div style={{ fontFamily: 'var(--font-mono)', fontSize: 15, fontWeight: 400, color: 'var(--muted)', letterSpacing: '-0.02em', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
                         {c.dailyCap}
                       </div>
-                      <div style={{ fontSize: 9, color: 'var(--dim)', textTransform: 'uppercase', letterSpacing: '0.07em', marginTop: 3, fontFamily: 'var(--font-mono)' }}>
+                      <div style={{ fontSize: 9, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.07em', marginTop: 3, fontFamily: 'var(--font-mono)' }}>
                         Daily cap
                       </div>
                     </div>
                   </div>
 
-                  {/* Status badge */}
                   <span style={{
                     display: 'inline-flex', alignItems: 'center', gap: 5,
-                    padding: '4px 10px', borderRadius: 6, flexShrink: 0,
-                    background: s.bg, fontSize: 11, fontWeight: 600, color: s.text,
+                    padding: '3px 9px', borderRadius: 6, flexShrink: 0,
+                    background: s.bg, fontSize: 11, fontWeight: 500, color: s.text,
                     fontFamily: 'var(--font-ui)',
                   }}>
-                    <span style={{ width: 6, height: 6, borderRadius: '50%', background: s.dot }} />
+                    <span style={{ width: 5, height: 5, borderRadius: '50%', background: s.dot }} />
                     {s.label}
                   </span>
                 </a>
