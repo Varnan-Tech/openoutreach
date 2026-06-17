@@ -40,7 +40,7 @@ function TF({ label, value, onChange, placeholder, required }: {
           e.target.style.boxShadow = '0 0 0 3px rgba(23,23,23,0.06)';
         }}
         onBlur={e => {
-          e.target.style.borderColor = 'var(--border-2)';
+          e.target.style.borderColor = 'var(--border)';
           e.target.style.boxShadow = 'none';
         }}
       />
@@ -63,7 +63,7 @@ function NF({ label, value, onChange, min, max }: {
           e.target.style.boxShadow = '0 0 0 3px rgba(23,23,23,0.06)';
         }}
         onBlur={e => {
-          e.target.style.borderColor = 'var(--border-2)';
+          e.target.style.borderColor = 'var(--border)';
           e.target.style.boxShadow = 'none';
         }}
       />
